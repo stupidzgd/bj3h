@@ -85,7 +85,7 @@ class UploadExcel extends Component {
   };
   render() {
     return (
-      <div>
+      <div style={{height: '150px'}}>
         <Dragger {...this.draggerProps()}>
           <p className="ant-upload-drag-icon">
             <Icon type="inbox" />

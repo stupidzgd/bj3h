@@ -22,6 +22,12 @@ const menuList = [
     roles:["admin","editor"]
   },
   {
+    title: "数据导入",
+    path: "/import",
+    icon: "key",
+    roles:["admin","editor","guest"]
+  },
+  {
     title: "权限测试",
     path: "/permission",
     icon: "lock",

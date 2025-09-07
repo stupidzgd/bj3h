@@ -24,9 +24,11 @@ const Error404 = Loadable({loader: () => import(/*webpackChunkName:'Error404'*/'
 const User = Loadable({loader: () => import(/*webpackChunkName:'User'*/'@/views/user'),loading: Loading});
 const About = Loadable({loader: () => import(/*webpackChunkName:'About'*/'@/views/about'),loading: Loading});
 const Bug = Loadable({loader: () => import(/*webpackChunkName:'Bug'*/'@/views/bug'),loading: Loading});
+const ImportExcel = Loadable({ loader: () => import(/*webpackChunkName:'ImportExcel'*/'@/views/excel/importExcel'),loading: Loading });
 
 export default [
   { path: "/dashboard", component: Dashboard, roles: ["admin","editor","guest"] },
+  { path: "/import", component: ImportExcel, roles: ["admin","editor","guest"] },
   { path: "/doc", component: Doc, roles: ["admin","editor","guest"] },
   { path: "/guide", component: Guide, roles: ["admin","editor"] },
   { path: "/permission/explanation", component: Explanation, roles: ["admin"] },
