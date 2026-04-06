@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Table, Tag, Form, Icon, Button, Input, message, Collapse } from "antd";
-import { excelList } from "@/api/excel";
+import { getExcelData } from "@/api/excel";
 const { Panel } = Collapse;
 const columns = [
   {
@@ -49,13 +49,24 @@ class Zip extends Component {
     selectedRows: [],
     selectedRowKeys: [],
   };
-  fetchData = () => {
-    excelList().then((response) => {
-      const list = response.data.data.items;
+  fetchData = async () => {
+    try {
+      const response = await getExcelData();
+      // 转换数据格式，适配表格需要的格式
+      const list = response.data.map(item => ({
+        id: item.id,
+        title: item.title || item.article_id || '',
+        author: item.author || '',
+        readings: item.reading_count || 0,
+        date: item.publish_time ? new Date(item.publish_time).toLocaleDateString() : ''
+      }));
       if (this._isMounted) {
         this.setState({ list });
       }
-    });
+    } catch (error) {
+      console.error('获取数据失败:', error);
+      message.error('获取数据失败，请检查后端服务是否正常');
+    }
   };
   componentDidMount() {
     this._isMounted = true;

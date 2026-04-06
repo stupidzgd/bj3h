@@ -110,13 +110,13 @@ const Login = (props) => {
                 登录
               </Button>
             </Form.Item>
-            <Form.Item>
+            {/* <Form.Item>
               <span>账号 : admin 密码 : 随便填</span>
               <br />
               <span>账号 : editor 密码 : 随便填</span>
               <br />
               <span>账号 : guest 密码 : 随便填</span>
-            </Form.Item>
+            </Form.Item> */}
           </Spin>
         </Form>
       </div>

@@ -1,0 +1,62 @@
+.login-container {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background-image: url('~@/assets/images/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-bottom: 10%;
+}
+.login-container > .title {
+  color: #eee;
+  font-size: 26px;
+  font-weight: 400;
+  margin: 0px auto 30px auto;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.login-container .spin-wrap {
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  line-height: 90vh;
+  z-index: 999;
+}
+.login-container .content {
+  margin-right: 10%;
+  background-color: #fff;
+  width: 360px;
+  padding: 40px 30px;
+  box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+.login-container .content .title {
+  text-align: center;
+  margin: 0 0 30px 0;
+}
+.login-container .content .two-button-wrap {
+  display: flex;
+  justify-content: space-between;
+}
+.login-container .content .row-container {
+  display: flex;
+  justify-content: space-between;
+}
+.login-container .content .user-type-button {
+  width: 45%;
+}
+.login-container .content .login-form-button {
+  width: 100%;
+}
+.login-container .content .login-form-forgot {
+  float: right;
+}

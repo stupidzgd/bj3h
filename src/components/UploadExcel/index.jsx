@@ -39,7 +39,7 @@ class UploadExcel extends Component {
     return {
       name: "file",
       multiple: false,
-      accept: ".xlsx, .xls",
+      accept: ".xlsx, .xls, .csv",
       onChange(info) {
         const { status } = info.file;
         if (status === "done") {
@@ -70,7 +70,8 @@ class UploadExcel extends Component {
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const header = getHeaderRow(worksheet);
-        const results = XLSX.utils.sheet_to_json(worksheet);
+        // 添加raw: true选项，保留Excel的原始数据，避免日期被自动转换
+        const results = XLSX.utils.sheet_to_json(worksheet, { raw: true });
         this.generateData({ header, results });
         resolve();
       };
@@ -85,13 +86,13 @@ class UploadExcel extends Component {
   };
   render() {
     return (
-      <div style={{height: '150px'}}>
+      <div style={{height: '100px'}}>
         <Dragger {...this.draggerProps()}>
           <p className="ant-upload-drag-icon">
             <Icon type="inbox" />
           </p>
-          <p className="ant-upload-text">
-            Click or drag file to this area to upload
+          <p className="ant-upload-text" style={{marginTop: '-20px'}}>
+            点击或拖拽上传文件
           </p>
         </Dragger>
       </div>

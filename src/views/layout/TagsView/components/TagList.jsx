@@ -118,7 +118,7 @@ class TagList extends Component {
           )}
         >
           <ul className="tags-wrap" ref={this.tagListContainer}>
-            {taglist.map((tag) => (
+            {taglist.filter(tag => tag && tag.path).map((tag) => (
               <li key={tag.path}>
                 <Tag
                   onClose={this.handleClose.bind(null, tag)}

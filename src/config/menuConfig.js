@@ -3,6 +3,7 @@
  * roles:标明当前菜单项在何种角色下可以显示，如果不写此选项，表示该菜单项完全公开，在任何角色下都显示
  */
 const menuList = [
+  /*
   {
     title: "首页",
     path: "/dashboard",
@@ -21,12 +22,14 @@ const menuList = [
     icon: "key",
     roles:["admin","editor"]
   },
+  */
   {
     title: "数据导入",
     path: "/import",
     icon: "key",
     roles:["admin","editor","guest"]
   },
+  /*
   {
     title: "权限测试",
     path: "/permission",
@@ -154,6 +157,26 @@ const menuList = [
       }
     ],
   },
+  */
+  {
+    title: "数据分析",
+    path: "/analysis",
+    icon: "area-chart",
+    roles:["admin","editor"],
+    children: [
+      {
+        title: "综合查询",
+        path: "/analysis/comprehensive",
+        roles:["admin","editor"]
+      },
+      {
+        title: "数据指标分析",
+        path: "/analysis/overview",
+        roles:["admin","editor"]
+      },
+    ],
+  },
+  /*
   {
     title: "Zip",
     path: "/zip",
@@ -184,5 +207,6 @@ const menuList = [
     icon: "bug",
     roles:["admin"]
   },
+  */
 ];
 export default menuList;
