@@ -165,9 +165,50 @@ class ComprehensiveQuery extends Component {
         );
       } else if (item === '发布时间') {
         column.width = 180;
-      } else if (item === '阅读量' || item === '分享量' || item === '点赞量' || item === '收藏量') {
+        column.sorter = (a, b) => {
+          const dateA = new Date(a[item]).getTime();
+          const dateB = new Date(b[item]).getTime();
+          return dateA - dateB;
+        };
+      } else if (item === '导入时间') {
+        column.sorter = (a, b) => {
+          const dateA = new Date(a[item]).getTime();
+          const dateB = new Date(b[item]).getTime();
+          return dateA - dateB;
+        };
+      } else if (item === '是否首发') {
+        column.sorter = (a, b) => {
+          return a[item].localeCompare(b[item]);
+        };
+      } else if (item === '阅读量' || item === '分享量' || item === '点赞量' || item === '收藏量' || item === '热搜阅读量') {
         column.width = 80;
-      } else if (item === '完播率' || item === '京内占比' || item === '京外占比') {
+        column.sorter = (a, b) => {
+          return a[item] - b[item];
+        };
+      } else if (item === '完播率') {
+        column.width = 90;
+        column.sorter = (a, b) => {
+          const rateA = parseFloat(a[item]) || 0;
+          const rateB = parseFloat(b[item]) || 0;
+          return rateA - rateB;
+        };
+      } else if (item === '平均播放时长') {
+        column.sorter = (a, b) => {
+          // 处理不同格式的时长，如"00:00:00"或数字
+          const parseTime = (time) => {
+            if (typeof time === 'number') return time;
+            if (typeof time === 'string') {
+              if (time.includes(':')) {
+                const parts = time.split(':').map(Number);
+                return parts[0] * 3600 + parts[1] * 60 + parts[2];
+              }
+              return parseFloat(time) || 0;
+            }
+            return 0;
+          };
+          return parseTime(a[item]) - parseTime(b[item]);
+        };
+      } else if (item === '京内占比' || item === '京外占比') {
         column.width = 90;
       } else if (item === '科室名称' || item === '科室分类') {
         column.width = 160;

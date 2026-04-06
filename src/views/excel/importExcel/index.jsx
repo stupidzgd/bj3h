@@ -99,7 +99,7 @@ class ImportExcel extends Component {
       
       // 构建主数据
       const mainData = {
-        platform: platformMap[item['平台']] || item['平台'] || '',
+        platform: item['平台'] || '',
         article_id: item['文章ID'] || '',
         title: item['标题'] || '',
         is_first_release: item['是否首发'] || null,
