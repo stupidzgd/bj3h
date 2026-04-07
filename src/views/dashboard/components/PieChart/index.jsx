@@ -52,6 +52,11 @@ class PieChart extends Component {
       return;
     }
     window.removeEventListener("resize", () => this.resize()); // 移除窗口，变化时重置图表
+    try {
+      this.state.chart.dispose();
+    } catch (error) {
+      console.warn('销毁图表时出错:', error);
+    }
     this.setState({ chart: null });
   }
 

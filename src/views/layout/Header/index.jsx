@@ -14,6 +14,7 @@ const LayoutHeader = (props) => {
   const {
     token,
     avatar,
+    name,
     sidebarCollapsed,
     logout,
     getUserInfo,
@@ -90,12 +91,13 @@ const LayoutHeader = (props) => {
         <Hamburger />
         <BreadCrumb />
         <div className="right-menu">
-          {/* <FullScreen /> */}
-          {/* {showSettings ? <Settings /> : null} */}
+          {/* <FullScreen />
+          {showSettings ? <Settings /> : null} */}
           <div className="dropdown-wrap">
             <Dropdown overlay={menu}>
-              <div>
-                <Avatar shape="square" size="medium" src={avatar} />
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar shape="square" size="medium" src={avatar} style={{ marginRight: '8px' }} />
+                <span className="username" style={{ marginRight: '8px', fontSize: '14px', fontWeight: '700', color: 'rgba(0,0,0,.85)' }}>{name || '用户'}</span>
                 <Icon style={{ color: "rgba(0,0,0,.3)" }} type="caret-down" />
               </div>
             </Dropdown>

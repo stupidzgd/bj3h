@@ -13,7 +13,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
-  const [timeRange, setTimeRange] = useState('7d');
+  const [timeRange, setTimeRange] = useState('all');
   const [dateRange, setDateRange] = useState(null);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
@@ -106,8 +106,20 @@ const Dashboard = () => {
 
       // 3. 内容分类分析
       const contentMap = {};
+      // 内容分类映射表
+      const contentCategoryMap = {
+        '1': '新闻资讯',
+        '2': '学术研究',
+        '3': '医学科普',
+        '4': '健康生活',
+        '5': '政策法规'
+      };
       data.forEach(item => {
-        const category = item.content_category || item['内容分类'] || '未知';
+        let category = item.content_category || item['内容分类'] || '未知';
+        // 将数字分类转换为具体名称
+        if (contentCategoryMap[category]) {
+          category = contentCategoryMap[category];
+        }
         contentMap[category] = (contentMap[category] || 0) + 1;
       });
       const contentCategory = Object.entries(contentMap).map(([name, value]) => ({
@@ -147,13 +159,27 @@ const Dashboard = () => {
       // 6. 科室贡献分析
       const departmentMap = {};
       data.forEach(item => {
-        const department = item.department_category || item['科室分类'] || '未知';
-        departmentMap[department] = (departmentMap[department] || 0) + 1;
+        let department = item.department_category || item['科室分类'] || '未知';
+        // 按顿号分割科室名称，分别计算每个科室的贡献
+        if (department && department.includes('、')) {
+          const departments = department.split('、');
+          departments.forEach(dept => {
+            if (dept.trim()) {
+              departmentMap[dept.trim()] = (departmentMap[dept.trim()] || 0) + 1;
+            }
+          });
+        } else {
+          departmentMap[department] = (departmentMap[department] || 0) + 1;
+        }
       });
       const departmentContribution = Object.entries(departmentMap).map(([name, value]) => ({
         name,
         value
       }));
+      // 确保科室贡献数据至少有2个数据点，避免ECharts雷达图错误
+      if (departmentContribution.length < 2) {
+        departmentContribution.push({ name: '其他', value: 0 });
+      }
 
       // 7. 互动数据统计
       const interactionStats = [
@@ -206,22 +232,27 @@ const Dashboard = () => {
 
   const handleTimeRangeChange = (value) => {
     setTimeRange(value);
-    const end = moment();
-    let start;
-    switch (value) {
-      case '7d':
-        start = end.clone().subtract(6, 'days');
-        break;
-      case '30d':
-        start = end.clone().subtract(29, 'days');
-        break;
-      case '90d':
-        start = end.clone().subtract(89, 'days');
-        break;
-      default:
-        start = end.clone().subtract(6, 'days');
+    if (value === 'all') {
+      // 选择"全部"时，不设置日期范围，查询所有数据
+      setDateRange(null);
+    } else {
+      const end = moment();
+      let start;
+      switch (value) {
+        case '7d':
+          start = end.clone().subtract(6, 'days');
+          break;
+        case '30d':
+          start = end.clone().subtract(29, 'days');
+          break;
+        case '90d':
+          start = end.clone().subtract(89, 'days');
+          break;
+        default:
+          start = end.clone().subtract(6, 'days');
+      }
+      setDateRange([start, end]);
     }
-    setDateRange([start, end]);
   };
 
   const handleDateRangeChange = (dates) => {
@@ -284,6 +315,7 @@ const Dashboard = () => {
               onChange={handleTimeRangeChange}
               style={{ width: 120 }}
             >
+              <Option value="all">全部</Option>
               <Option value="7d">最近7天</Option>
               <Option value="30d">最近30天</Option>
               <Option value="90d">最近90天</Option>
@@ -338,10 +370,16 @@ const Dashboard = () => {
           </Col>
           <Col xs={24} sm={24} lg={8}>
             <Card title="科室贡献分析">
-              <RaddarChart 
-                chartData={chartData.departmentContribution}
-                styles={{ height: '300px' }}
-              />
+              {chartData.departmentContribution.length >= 2 ? (
+                <RaddarChart 
+                  chartData={chartData.departmentContribution}
+                  styles={{ height: '300px' }}
+                />
+              ) : (
+                <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
+                  暂无足够数据
+                </div>
+              )}
             </Card>
           </Col>
           <Col xs={24} sm={24} lg={8}>

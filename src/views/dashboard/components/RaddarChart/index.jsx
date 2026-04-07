@@ -52,84 +52,205 @@ class RaddarChart extends Component {
       return;
     }
     window.removeEventListener("resize", () => this.resize()); // 移除窗口，变化时重置图表
+    try {
+      this.state.chart.dispose();
+    } catch (error) {
+      console.warn('销毁图表时出错:', error);
+    }
     this.setState({ chart: null });
   }
 
   setOptions(chartData) {
+    // 确保chart对象已经初始化
+    if (!this.state.chart) {
+      return;
+    }
+    
     const animationDuration = 3000;
-    const data = chartData && chartData.length > 0 ? chartData : [
-      { name: "Sales", value: 5000 },
-      { name: "Administration", value: 7000 },
-      { name: "Information Techology", value: 12000 },
-      { name: "Customer Support", value: 11000 },
-      { name: "Development", value: 15000 },
-      { name: "Marketing", value: 14000 },
-    ];
+    const data = chartData && chartData.length > 0 ? chartData : [];
     
-    const maxValue = Math.max(...data.map(item => item.value)) * 1.2;
-    
-    this.state.chart.setOption({
-      tooltip: {
-        trigger: "axis",
-        axisPointer: {
-          // 坐标轴指示器，坐标轴触发有效
-          type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
-        },
-      },
-      radar: {
-        radius: "66%",
-        center: ["50%", "42%"],
-        splitNumber: 8,
-        splitArea: {
-          areaStyle: {
-            color: "rgba(127,95,132,.3)",
-            opacity: 1,
-            shadowBlur: 45,
-            shadowColor: "rgba(0,0,0,.5)",
-            shadowOffsetX: 0,
-            shadowOffsetY: 15,
+    try {
+      // 过滤掉无效数据，确保每个item都有name和value属性
+      const validData = data.filter(item => item && item.name && typeof item.value === 'number');
+      
+      if (validData.length === 0) {
+        // 没有数据时显示空图表
+        this.state.chart.setOption({
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "shadow",
+            },
+          },
+          radar: {
+            radius: "66%",
+            center: ["50%", "42%"],
+            splitNumber: 8,
+            splitArea: {
+              areaStyle: {
+                color: "rgba(127,95,132,.3)",
+                opacity: 1,
+                shadowBlur: 45,
+                shadowColor: "rgba(0,0,0,.5)",
+                shadowOffsetX: 0,
+                shadowOffsetY: 15,
+              },
+            },
+            indicator: [],
+          },
+          legend: {
+            left: "center",
+            bottom: "10",
+            data: ["科室贡献"],
+          },
+          series: [],
+        });
+        return;
+      }
+      
+      // 确保至少有2个数据点，避免ECharts雷达图布局错误
+      if (validData.length < 2) {
+        this.state.chart.setOption({
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "shadow",
+            },
+          },
+          radar: {
+            radius: "66%",
+            center: ["50%", "42%"],
+            splitNumber: 8,
+            splitArea: {
+              areaStyle: {
+                color: "rgba(127,95,132,.3)",
+                opacity: 1,
+                shadowBlur: 45,
+                shadowColor: "rgba(0,0,0,.5)",
+                shadowOffsetX: 0,
+                shadowOffsetY: 15,
+              },
+            },
+            indicator: [],
+          },
+          legend: {
+            left: "center",
+            bottom: "10",
+            data: ["科室贡献"],
+          },
+          series: [],
+        });
+        return;
+      }
+      
+      const maxValue = Math.max(...validData.map(item => item.value)) * 1.2;
+      
+      // 构建雷达图数据，确保格式正确
+      const radarData = validData.map(item => item.value);
+      
+      this.state.chart.setOption({
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow",
           },
         },
-        indicator: data.map(item => ({
-          name: item.name,
-          max: maxValue
-        })),
-      },
-      legend: {
-        left: "center",
-        bottom: "10",
-        data: ["科室贡献"],
-      },
-      series: [
-        {
-          type: "radar",
-          symbolSize: 0,
-          areaStyle: {
-            normal: {
-              shadowBlur: 13,
-              shadowColor: "rgba(0,0,0,.2)",
-              shadowOffsetX: 0,
-              shadowOffsetY: 10,
+        radar: {
+          radius: "66%",
+          center: ["50%", "42%"],
+          splitNumber: 8,
+          splitArea: {
+            areaStyle: {
+              color: "rgba(127,95,132,.3)",
               opacity: 1,
+              shadowBlur: 45,
+              shadowColor: "rgba(0,0,0,.5)",
+              shadowOffsetX: 0,
+              shadowOffsetY: 15,
             },
           },
-          data: [
-            {
-              value: data.map(item => item.value),
-              name: "科室贡献",
-            },
-          ],
-          animationDuration,
+          indicator: validData.map(item => ({
+            name: item.name,
+            max: maxValue
+          })),
         },
-      ],
-    });
+        legend: {
+          left: "center",
+          bottom: "10",
+          data: ["科室贡献"],
+        },
+        series: [
+          {
+            type: "radar",
+            symbolSize: 0,
+            areaStyle: {
+              normal: {
+                shadowBlur: 13,
+                shadowColor: "rgba(0,0,0,.2)",
+                shadowOffsetX: 0,
+                shadowOffsetY: 10,
+                opacity: 1,
+              },
+            },
+            data: [
+              {
+                value: radarData,
+                name: "科室贡献",
+              },
+            ],
+            animationDuration,
+          },
+        ],
+      });
+    } catch (error) {
+      console.warn('设置图表选项时出错:', error);
+      // 出错时显示空图表
+      try {
+        this.state.chart.setOption({
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "shadow",
+            },
+          },
+          radar: {
+            radius: "66%",
+            center: ["50%", "42%"],
+            splitNumber: 8,
+            splitArea: {
+              areaStyle: {
+                color: "rgba(127,95,132,.3)",
+                opacity: 1,
+                shadowBlur: 45,
+                shadowColor: "rgba(0,0,0,.5)",
+                shadowOffsetX: 0,
+                shadowOffsetY: 15,
+              },
+            },
+            indicator: [],
+          },
+          legend: {
+            left: "center",
+            bottom: "10",
+            data: ["科室贡献"],
+          },
+          series: [],
+        });
+      } catch (innerError) {
+        console.warn('显示空图表时出错:', innerError);
+      }
+    }
   }
 
   initChart() {
     if (!this.el) return;
-    this.setState({ chart: echarts.init(this.el, "macarons") }, () => {
-      this.setOptions(this.props.chartData);
-    });
+    try {
+      this.setState({ chart: echarts.init(this.el, "macarons") }, () => {
+        this.setOptions(this.props.chartData);
+      });
+    } catch (error) {
+      console.warn('初始化图表时出错:', error);
+    }
   }
 
   render() {

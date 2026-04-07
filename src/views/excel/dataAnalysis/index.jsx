@@ -197,7 +197,11 @@ class DataAnalysis extends Component {
   disposeCharts() {
     Object.values(this.state.charts).forEach(chart => {
       if (chart) {
-        chart.dispose();
+        try {
+          chart.dispose();
+        } catch (error) {
+          console.warn('销毁图表时出错:', error);
+        }
       }
     });
   }
@@ -250,7 +254,11 @@ class DataAnalysis extends Component {
       try {
         // 先销毁已存在的图表
         if (this.state.charts[containerId]) {
-          this.state.charts[containerId].dispose();
+          try {
+            this.state.charts[containerId].dispose();
+          } catch (error) {
+            console.warn('销毁图表时出错:', error);
+          }
         }
         const chart = echarts.init(container, "macarons");
         chart.setOption(options);
