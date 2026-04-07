@@ -10,12 +10,14 @@ class PieChart extends Component {
     height: PropTypes.string,
     className: PropTypes.string,
     styles: PropTypes.object,
+    chartData: PropTypes.array,
   };
   static defaultProps = {
     width: "100%",
     height: "300px",
     styles: {},
     className: "",
+    chartData: [],
   };
   state = {
     chart: null,
@@ -53,8 +55,16 @@ class PieChart extends Component {
     this.setState({ chart: null });
   }
 
-  setOptions() {
+  setOptions(chartData) {
     const animationDuration = 3000;
+    const data = chartData || [
+      { value: 320, name: "Industries" },
+      { value: 240, name: "Technology" },
+      { value: 149, name: "Forex" },
+      { value: 100, name: "Gold" },
+      { value: 59, name: "Forecasts" },
+    ];
+    
     this.state.chart.setOption({
       tooltip: {
         trigger: "item",
@@ -63,23 +73,17 @@ class PieChart extends Component {
       legend: {
         left: "center",
         bottom: "10",
-        data: ["Industries", "Technology", "Forex", "Gold", "Forecasts"],
+        data: data.map(item => item.name),
       },
       calculable: true,
       series: [
         {
-          name: "WEEKLY WRITE ARTICLES",
+          name: "数据分布",
           type: "pie",
           roseType: "radius",
           radius: [15, 95],
           center: ["50%", "38%"],
-          data: [
-            { value: 320, name: "Industries" },
-            { value: 240, name: "Technology" },
-            { value: 149, name: "Forex" },
-            { value: 100, name: "Gold" },
-            { value: 59, name: "Forecasts" },
-          ],
+          data: data,
           animationEasing: "cubicInOut",
           animationDuration
         },

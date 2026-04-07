@@ -46,7 +46,9 @@
   "scripts": {
     "start": "react-app-rewired start",
     "start:server": "cd server && npm start",
+    "start:server:dev": "cd server && npm run dev",
     "start:all": "concurrently \"npm start\" \"npm run start:server\"",
+    "start:all:dev": "concurrently \"npm start\" \"npm run start:server:dev\"",
     "stop": "echo \"Use Ctrl+C to stop the running services\"",
     "stop:server": "echo \"Use Ctrl+C to stop the running server\"",
     "build": "react-app-rewired --max-old-space-size=4096 build ",

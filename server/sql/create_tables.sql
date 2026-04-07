@@ -1,3 +1,8 @@
+-- 创建数据库
+CREATE DATABASE IF NOT EXISTS `bj3h` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE `bj3h`;
+
 -- 创建DictType表
 CREATE TABLE IF NOT EXISTS `dict_type` (
   `id` INT NOT NULL AUTO_INCREMENT,

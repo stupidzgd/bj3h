@@ -10,12 +10,14 @@ class RaddarChart extends Component {
     height: PropTypes.string,
     className: PropTypes.string,
     styles: PropTypes.object,
+    chartData: PropTypes.array,
   };
   static defaultProps = {
     width: "100%",
     height: "300px",
     styles: {},
     className: "",
+    chartData: [],
   };
   state = {
     chart: null,
@@ -53,8 +55,19 @@ class RaddarChart extends Component {
     this.setState({ chart: null });
   }
 
-  setOptions() {
+  setOptions(chartData) {
     const animationDuration = 3000;
+    const data = chartData && chartData.length > 0 ? chartData : [
+      { name: "Sales", value: 5000 },
+      { name: "Administration", value: 7000 },
+      { name: "Information Techology", value: 12000 },
+      { name: "Customer Support", value: 11000 },
+      { name: "Development", value: 15000 },
+      { name: "Marketing", value: 14000 },
+    ];
+    
+    const maxValue = Math.max(...data.map(item => item.value)) * 1.2;
+    
     this.state.chart.setOption({
       tooltip: {
         trigger: "axis",
@@ -77,19 +90,15 @@ class RaddarChart extends Component {
             shadowOffsetY: 15,
           },
         },
-        indicator: [
-          { name: "Sales", max: 10000 },
-          { name: "Administration", max: 20000 },
-          { name: "Information Techology", max: 20000 },
-          { name: "Customer Support", max: 20000 },
-          { name: "Development", max: 20000 },
-          { name: "Marketing", max: 20000 },
-        ],
+        indicator: data.map(item => ({
+          name: item.name,
+          max: maxValue
+        })),
       },
       legend: {
         left: "center",
         bottom: "10",
-        data: ["Allocated Budget", "Expected Spending", "Actual Spending"],
+        data: ["科室贡献"],
       },
       series: [
         {
@@ -106,16 +115,8 @@ class RaddarChart extends Component {
           },
           data: [
             {
-              value: [5000, 7000, 12000, 11000, 15000, 14000],
-              name: "Allocated Budget",
-            },
-            {
-              value: [4000, 9000, 15000, 15000, 13000, 11000],
-              name: "Expected Spending",
-            },
-            {
-              value: [5500, 11000, 12000, 15000, 12000, 12000],
-              name: "Actual Spending",
+              value: data.map(item => item.value),
+              name: "科室贡献",
             },
           ],
           animationDuration,

@@ -10,12 +10,14 @@ class BarChart extends Component {
     height: PropTypes.string,
     className: PropTypes.string,
     styles: PropTypes.object,
+    chartData: PropTypes.array,
   };
   static defaultProps = {
     width: "100%",
     height: "300px",
     styles: {},
     className: "",
+    chartData: [],
   };
   state = {
     chart: null,
@@ -53,8 +55,18 @@ class BarChart extends Component {
     this.setState({ chart: null });
   }
 
-  setOptions() {
+  setOptions(chartData) {
     const animationDuration = 3000;
+    const data = chartData || [
+      { name: "Mon", value: 79 },
+      { name: "Tue", value: 52 },
+      { name: "Wed", value: 200 },
+      { name: "Thu", value: 334 },
+      { name: "Fri", value: 390 },
+      { name: "Sat", value: 330 },
+      { name: "Sun", value: 220 },
+    ];
+    
     this.state.chart.setOption({
       tooltip: {
         trigger: "axis",
@@ -73,7 +85,7 @@ class BarChart extends Component {
       xAxis: [
         {
           type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          data: data.map(item => item.name),
           axisTick: {
             alignWithLabel: true,
           },
@@ -89,27 +101,11 @@ class BarChart extends Component {
       ],
       series: [
         {
-          name: "pageA",
+          name: "数据量",
           type: "bar",
           stack: "vistors",
           barWidth: "60%",
-          data: [79, 52, 200, 334, 390, 330, 220],
-          animationDuration,
-        },
-        {
-          name: "pageB",
-          type: "bar",
-          stack: "vistors",
-          barWidth: "60%",
-          data: [80, 52, 200, 334, 390, 330, 220],
-          animationDuration,
-        },
-        {
-          name: "pageC",
-          type: "bar",
-          stack: "vistors",
-          barWidth: "60%",
-          data: [30, 52, 200, 334, 390, 330, 220],
+          data: data.map(item => item.value),
           animationDuration,
         },
       ],

@@ -547,11 +547,12 @@ class ImportExcel extends Component {
   };
 
   // 处理分页变化
-  handlePaginationChange = (current, pageSize) => {
+  handlePaginationChange = (pagination) => {
+    console.log('分页变化:', pagination);
     this.setState({
       pagination: {
-        current,
-        pageSize
+        current: pagination.current,
+        pageSize: pagination.pageSize
       }
     });
   };
@@ -598,6 +599,7 @@ class ImportExcel extends Component {
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50', '100'],
                 showTotal: (total) => `共 ${total} 条数据`,
+                total: importCount,
                 onChange: this.handlePaginationChange
               }}
               rowKey={(record, index) => index}

@@ -2550,158 +2550,278 @@ class DataAnalysis extends Component {
         <Card>
           <Spin spinning={loading} tip="正在加载数据...">
             <Tabs defaultActiveKey="time" onChange={this.handleTabChange} activeKey={this.state.activeTab}>
-            <TabPane tab="时间维度" key="time">
-              <div style={{ marginBottom: 16 }}>
-                <h3>按月份发布数量分析</h3>
-                <div 
-                  id="time-chart" 
-                  ref={(el) => this.chartRefs['time-chart'] = el}
-                  style={{ width: '100%', height: '400px', marginBottom: 24 }} 
-                />
-                {this.analyzeByTime()}
-              </div>
-            </TabPane>
-            <TabPane tab="平台维度" key="platform">
-              <div style={{ marginBottom: 16 }}>
-                <h3>各平台发布数量分析</h3>
-                <div 
-                  id="platform-bar-chart" 
-                  ref={(el) => this.chartRefs['platform-bar-chart'] = el}
-                  style={{ width: '100%', height: '400px', marginBottom: 24, border: '1px solid #f0f0f0' }} 
-                />
-                <h3>各平台发布数量占比</h3>
-                <div 
-                  id="platform-chart" 
-                  ref={(el) => this.chartRefs['platform-chart'] = el}
-                  style={{ width: '100%', height: '400px', marginBottom: 24, border: '1px solid #f0f0f0' }} 
-                />
-                {this.analyzeByPlatform()}
-              </div>
-            </TabPane>
-            <TabPane tab="是否首发" key="first-release">
-              <div style={{ marginBottom: 16 }}>
-                <h3>是否首发分析</h3>
-                <div 
-                  id="first-release-chart" 
-                  ref={(el) => this.chartRefs['first-release-chart'] = el}
-                  style={{ width: '100%', height: '400px', marginBottom: 24, border: '1px solid #f0f0f0' }} 
-                />
-                {this.analyzeByFirstRelease()}
-              </div>
-            </TabPane>
-            <TabPane tab="内容维度" key="content">
-              <div style={{ marginBottom: 16 }}>
-                <h3>内容分类发布数量</h3>
-                <div 
-                  id="content-chart" 
-                  ref={(el) => this.chartRefs['content-chart'] = el}
-                  style={{ width: '100%', height: '400px', marginBottom: 24 }} 
-                />
-                {this.analyzeByContent()}
-              </div>
-            </TabPane>
-            <TabPane tab="影响力维度" key="influence">
-              <div style={{ marginBottom: 16 }}>
-                <h3>影响力分析</h3>
-                {this.analyzeByInfluence()}
-              </div>
-            </TabPane>
-            <TabPane tab="用户维度" key="user">
-              <div style={{ marginBottom: 16 }}>
-                <h3>用户地域分布</h3>
-                <div 
-                  id="user-chart" 
-                  ref={(el) => this.chartRefs['user-chart'] = el}
-                  style={{ width: '100%', height: '400px', marginBottom: 24 }} 
-                />
-                {this.analyzeByUser()}
-              </div>
-            </TabPane>
-            <TabPane tab="创作维度" key="creation">
-              <Tabs defaultActiveKey="department-name" onChange={(key) => {
-                if (key === 'department-category') {
-                  // 当切换到科室分类tab时初始化图表
-                  setTimeout(() => {
-                    this.initDepartmentCategoryChart();
-                  }, 100);
-                } else if (key === 'genre-category') {
-                  // 当切换到体裁分类tab时初始化图表
-                  setTimeout(() => {
-                    this.initGenreCategoryChart();
-                  }, 100);
-                }
-              }}>
-                <TabPane tab="科室名称" key="department-name">
-                  <div style={{ marginBottom: 16 }}>
-                    <h3>科室名称分析</h3>
-                    {this.analyzeByDepartmentName()}
+              <TabPane tab="时间维度" key="time">
+                {!loading && this.state.analysisData.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
                   </div>
-                </TabPane>
-                <TabPane tab="科室分类" key="department-category">
+                ) : (
                   <div style={{ marginBottom: 16 }}>
-                    <h3>科室分类分析</h3>
+                    <h3>按月份发布数量分析</h3>
                     <div 
-                      id="department-category-chart" 
-                      ref={(el) => {
-                        this.chartRefs['department-category-chart'] = el;
-                      }}
+                      id="time-chart" 
+                      ref={(el) => this.chartRefs['time-chart'] = el}
                       style={{ width: '100%', height: '400px', marginBottom: 24 }} 
                     />
-                    {this.analyzeByDepartmentCategory()}
+                    {this.analyzeByTime()}
                   </div>
-                </TabPane>
-                <TabPane tab="作者" key="author">
-                  <div style={{ marginBottom: 16 }}>
-                    <h3>作者分析</h3>
-                    {this.analyzeByAuthor()}
+                )}
+              </TabPane>
+              <TabPane tab="平台维度" key="platform">
+                {!loading && this.state.analysisData.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
                   </div>
-                </TabPane>
-                <TabPane tab="记者" key="reporter">
+                ) : (
                   <div style={{ marginBottom: 16 }}>
-                    <h3>记者分析</h3>
-                    {this.analyzeByReporter()}
-                  </div>
-                </TabPane>
-                <TabPane tab="具体栏目" key="media-column">
-                  <div style={{ marginBottom: 16 }}>
-                    <h3>具体栏目分析</h3>
-                    {this.analyzeByMediaColumn()}
-                  </div>
-                </TabPane>
-                <TabPane tab="体裁分类" key="genre-category">
-                  <div style={{ marginBottom: 16 }}>
-                    <h3>体裁分类分析</h3>
+                    <h3>各平台发布数量分析</h3>
                     <div 
-                      id="genre-category-chart" 
-                      ref={(el) => {
-                        this.chartRefs['genre-category-chart'] = el;
-                      }}
+                      id="platform-bar-chart" 
+                      ref={(el) => this.chartRefs['platform-bar-chart'] = el}
+                      style={{ width: '100%', height: '400px', marginBottom: 24, border: '1px solid #f0f0f0' }} 
+                    />
+                    <h3>各平台发布数量占比</h3>
+                    <div 
+                      id="platform-chart" 
+                      ref={(el) => this.chartRefs['platform-chart'] = el}
+                      style={{ width: '100%', height: '400px', marginBottom: 24, border: '1px solid #f0f0f0' }} 
+                    />
+                    {this.analyzeByPlatform()}
+                  </div>
+                )}
+              </TabPane>
+              <TabPane tab="是否首发" key="first-release">
+                {!loading && this.state.analysisData.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: 16 }}>
+                    <h3>是否首发分析</h3>
+                    <div 
+                      id="first-release-chart" 
+                      ref={(el) => this.chartRefs['first-release-chart'] = el}
+                      style={{ width: '100%', height: '400px', marginBottom: 24, border: '1px solid #f0f0f0' }} 
+                    />
+                    {this.analyzeByFirstRelease()}
+                  </div>
+                )}
+              </TabPane>
+              <TabPane tab="内容维度" key="content">
+                {!loading && this.state.analysisData.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: 16 }}>
+                    <h3>内容分类发布数量</h3>
+                    <div 
+                      id="content-chart" 
+                      ref={(el) => this.chartRefs['content-chart'] = el}
                       style={{ width: '100%', height: '400px', marginBottom: 24 }} 
                     />
-                    {this.analyzeByGenreCategory()}
+                    {this.analyzeByContent()}
                   </div>
-                </TabPane>
-                <TabPane tab="视频时长" key="video-duration">
+                )}
+              </TabPane>
+              <TabPane tab="影响力维度" key="influence">
+                {!loading && this.state.analysisData.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                  </div>
+                ) : (
                   <div style={{ marginBottom: 16 }}>
-                    <h3>视频时长分析</h3>
-                    {this.analyzeByVideoDuration()}
+                    <h3>影响力分析</h3>
+                    {this.analyzeByInfluence()}
                   </div>
-                </TabPane>
-                <TabPane tab="专项策划" key="special-planning">
+                )}
+              </TabPane>
+              <TabPane tab="用户维度" key="user">
+                {!loading && this.state.analysisData.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                  </div>
+                ) : (
                   <div style={{ marginBottom: 16 }}>
-                    <h3>专项策划分析</h3>
-                    {this.analyzeBySpecialPlanning()}
+                    <h3>用户地域分布</h3>
+                    <div 
+                      id="user-chart" 
+                      ref={(el) => this.chartRefs['user-chart'] = el}
+                      style={{ width: '100%', height: '400px', marginBottom: 24 }} 
+                    />
+                    {this.analyzeByUser()}
                   </div>
-                </TabPane>
-              </Tabs>
-            </TabPane>
-            <TabPane tab="互动外延" key="interaction">
-              <div style={{ marginBottom: 16 }}>
-                <h3>互动外延分析</h3>
-                {this.analyzeByInteraction()}
-              </div>
-            </TabPane>
-          </Tabs>
+                )}
+              </TabPane>
+              <TabPane tab="创作维度" key="creation">
+                <Tabs defaultActiveKey="department-name" onChange={(key) => {
+                  if (key === 'department-category') {
+                    // 当切换到科室分类tab时初始化图表
+                    setTimeout(() => {
+                      this.initDepartmentCategoryChart();
+                    }, 100);
+                  } else if (key === 'genre-category') {
+                    // 当切换到体裁分类tab时初始化图表
+                    setTimeout(() => {
+                      this.initGenreCategoryChart();
+                    }, 100);
+                  }
+                }}>
+                  <TabPane tab="科室名称" key="department-name">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>科室名称分析</h3>
+                        {this.analyzeByDepartmentName()}
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tab="科室分类" key="department-category">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>科室分类分析</h3>
+                        <div 
+                          id="department-category-chart" 
+                          ref={(el) => {
+                            this.chartRefs['department-category-chart'] = el;
+                          }}
+                          style={{ width: '100%', height: '400px', marginBottom: 24 }} 
+                        />
+                        {this.analyzeByDepartmentCategory()}
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tab="作者" key="author">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>作者分析</h3>
+                        {this.analyzeByAuthor()}
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tab="记者" key="reporter">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>记者分析</h3>
+                        {this.analyzeByReporter()}
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tab="具体栏目" key="media-column">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>具体栏目分析</h3>
+                        {this.analyzeByMediaColumn()}
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tab="体裁分类" key="genre-category">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>体裁分类分析</h3>
+                        <div 
+                          id="genre-category-chart" 
+                          ref={(el) => {
+                            this.chartRefs['genre-category-chart'] = el;
+                          }}
+                          style={{ width: '100%', height: '400px', marginBottom: 24 }} 
+                        />
+                        {this.analyzeByGenreCategory()}
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tab="视频时长" key="video-duration">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>视频时长分析</h3>
+                        {this.analyzeByVideoDuration()}
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tab="专项策划" key="special-planning">
+                    {!loading && this.state.analysisData.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: 16 }}>
+                        <h3>专项策划分析</h3>
+                        {this.analyzeBySpecialPlanning()}
+                      </div>
+                    )}
+                  </TabPane>
+                </Tabs>
+              </TabPane>
+              <TabPane tab="互动外延" key="interaction">
+                {!loading && this.state.analysisData.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
+                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
+                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: 16 }}>
+                    <h3>互动外延分析</h3>
+                    {this.analyzeByInteraction()}
+                  </div>
+                )}
+              </TabPane>
+            </Tabs>
           </Spin>
         </Card>
       </div>

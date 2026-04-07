@@ -55,10 +55,13 @@ class LineChart extends Component {
   }
 
   setOptions({ expectedData, actualData } = {}) {
+    const defaultData = [120, 82, 91, 154, 162, 140, 145];
+    const data = expectedData || defaultData;
+    
     this.state.chart.setOption({
       backgroundColor: "#fff",
       xAxis: {
-        data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        data: data.map((_, index) => `Day ${index + 1}`),
         boundaryGap: false,
         axisTick: {
           show: false,
@@ -84,28 +87,11 @@ class LineChart extends Component {
         },
       },
       legend: {
-        data: ["expected", "actual"],
+        data: ["阅读量"],
       },
       series: [
         {
-          name: "expected",
-          itemStyle: {
-            normal: {
-              color: "#FF005A",
-              lineStyle: {
-                color: "#FF005A",
-                width: 2,
-              },
-            },
-          },
-          smooth: true,
-          type: "line",
-          data: expectedData,
-          animationDuration: 2800,
-          animationEasing: "cubicInOut",
-        },
-        {
-          name: "actual",
+          name: "阅读量",
           smooth: true,
           type: "line",
           itemStyle: {
@@ -120,7 +106,7 @@ class LineChart extends Component {
               },
             },
           },
-          data: actualData,
+          data: data,
           animationDuration: 2800,
           animationEasing: "quadraticOut",
         },
