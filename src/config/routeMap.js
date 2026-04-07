@@ -21,7 +21,7 @@ const Dashboard = Loadable({loader: () => import(/*webpackChunkName:'Dashboard'*
 // const Zip = Loadable({loader: () => import(/*webpackChunkName:'Zip'*/'@/views/zip'),loading: Loading});
 // const Clipboard = Loadable({loader: () => import(/*webpackChunkName:'Clipboard'*/'@/views/clipboard'),loading: Loading});
 const Error404 = Loadable({loader: () => import(/*webpackChunkName:'Error404'*/'@/views/error/404'),loading: Loading});
-const User = Loadable({loader: () => import(/*webpackChunkName:'User'*/'@/views/user'),loading: Loading});
+// const User = Loadable({loader: () => import(/*webpackChunkName:'User'*/'@/views/user'),loading: Loading});
 // const About = Loadable({loader: () => import(/*webpackChunkName:'About'*/'@/views/about'),loading: Loading});
 // const Bug = Loadable({loader: () => import(/*webpackChunkName:'Bug'*/'@/views/bug'),loading: Loading});
 const ImportExcel = Loadable({ loader: () => import(/*webpackChunkName:'ImportExcel'*/'@/views/excel/importExcel'),loading: Loading });
@@ -52,7 +52,7 @@ export default [
   { path: "/analysis/comprehensive", component: ComprehensiveQuery, roles: ["admin","editor"] },
   // { path: "/zip", component: Zip, roles: ["admin","editor"] },
   // { path: "/clipboard", component: Clipboard, roles: ["admin","editor"] },
-  { path: "/user", component: User, roles: ["admin"] },
+  // { path: "/user", component: User, roles: ["admin"] },
   // { path: "/about", component: About, roles: ["admin", "editor", "guest"] },
   // { path: "/bug", component: Bug, roles: ["admin"] },
   { path: "/error/404", component: Error404 },

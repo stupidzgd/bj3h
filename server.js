@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 const port = 3000;
 const rootDir = '/www/wwwroot/bj3h/build';
 
@@ -52,20 +53,56 @@ const server = http.createServer((req, res) => {
   const ext = path.extname(filePath);
   const contentType = mimeTypes[ext] || 'application/octet-stream';
   
+  // 检查是否支持gzip
+  const acceptEncoding = req.headers['accept-encoding'] || '';
+  const supportsGzip = acceptEncoding.includes('gzip');
+  
   fs.readFile(filePath, (err, content) => {
     if (err) {
       if (err.code === 'ENOENT') {
         fs.readFile(path.join(rootDir, 'index.html'), (err, content) => {
-          res.writeHead(200, { 'Content-Type': 'text/html' });
-          res.end(content, 'utf-8');
+          if (supportsGzip) {
+            zlib.gzip(content, (err, compressedContent) => {
+              if (err) {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(content, 'utf-8');
+                return;
+              }
+              res.writeHead(200, {
+                'Content-Type': 'text/html',
+                'Content-Encoding': 'gzip'
+              });
+              res.end(compressedContent);
+            });
+          } else {
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(content, 'utf-8');
+          }
         });
       } else {
         res.writeHead(500);
         res.end('Server Error');
       }
     } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
+      // 只对文本类型文件进行gzip压缩
+      const compressibleTypes = ['.html', '.js', '.css', '.json', '.svg'];
+      if (supportsGzip && compressibleTypes.includes(ext)) {
+        zlib.gzip(content, (err, compressedContent) => {
+          if (err) {
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(content, 'utf-8');
+            return;
+          }
+          res.writeHead(200, {
+            'Content-Type': contentType,
+            'Content-Encoding': 'gzip'
+          });
+          res.end(compressedContent);
+        });
+      } else {
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(content, 'utf-8');
+      }
     }
   });
 });
