@@ -10,10 +10,10 @@ import menuList from "@/config/menuConfig";
 const { Content } = Layout;
 
 const getPageTitle = (menuList, pathname) => {
-  let title = "Ant Design Pro";
+  let title = "媒体数据分析平台";
   let item = getMenuItemInMenuListByProperty(menuList, "path", pathname);
   if (item) {
-    title = `${item.title} - Ant Design Pro`;
+    title = `${item.title} - 媒体数据分析平台`;
   }
   return title;
 };

@@ -13,11 +13,7 @@ class ImportExcel extends Component {
     tableColumns: [],
     loading: false,
     importCount: 0,
-    backendData: [],
-    pagination: {
-      current: 1,
-      pageSize: 10
-    }
+    backendData: []
   };
   componentDidMount() {
     // 从 sessionStorage 中恢复数据
@@ -38,21 +34,14 @@ class ImportExcel extends Component {
   handleSuccess = ({ results, header }) => {
     this.setState({ loading: true });
     
-    console.log('上传的数据长度:', results.length);
-    console.log('上传的原始数据:', results); // 显示全部数据
-    
     // 处理数据
     const processedResults = this.processData(results);
-    
-    console.log('处理后的数据长度:', processedResults.length);
-    console.log('处理后的数据:', processedResults); // 显示全部处理后的数据
     
     // 生成表格列
     const tableColumns = this.generateColumns(header);
     
     // 存储数据到Redux
     this.props.setExcelData(processedResults);
-    console.log('存储到Redux的数据长度:', processedResults.length);
     
     // 平台字典映射（使用统一配置）
     const platformMap = PLATFORM_MAP;
@@ -149,7 +138,6 @@ class ImportExcel extends Component {
       if (item['发布时间']) {
         if (typeof item['发布时间'] === 'number') {
           // 处理Excel的数字日期格式（从1900年1月1日开始计数的天数）
-          console.log('原始数字日期:', item['发布时间']);
           // 使用moment.js转换Excel日期数字
           // Excel的日期从1900年1月1日开始，moment.js的日期从1970年1月1日开始
           // 需要调整日期偏移
@@ -159,14 +147,10 @@ class ImportExcel extends Component {
           const date = moment('1899-12-30').add(excelDate, 'days').utcOffset(8);
           if (date.isValid()) {
             item['发布时间'] = date.format('YYYY-MM-DD HH:mm:ss');
-            console.log('数字日期解析结果:', item['发布时间']);
-          } else {
-            console.log('数字日期解析失败:', excelDate);
           }
         } else if (typeof item['发布时间'] === 'string') {
           // 使用moment.js处理日期时间，避免时区问题
           const dateStr = item['发布时间'];
-          console.log('原始发布时间:', dateStr);
           
           // 尝试解析日期，支持多种格式
           let date = null;
@@ -190,9 +174,6 @@ class ImportExcel extends Component {
             // 格式化为标准日期时间字符串，确保时区正确
             // 使用utcOffset(8)确保使用东八区时间
             item['发布时间'] = date.utcOffset(8).format('YYYY-MM-DD HH:mm:ss');
-            console.log('解析结果:', item['发布时间']);
-          } else {
-            console.log('日期解析失败:', dateStr);
           }
         }
       }
@@ -457,7 +438,6 @@ class ImportExcel extends Component {
         try {
           // 发送数据到后端
           const response = await importExcelApi({ data: backendData });
-          console.log('后端响应:', response);
           message.success(`成功导入 ${response.data.total} 条数据到数据库，其中新创建 ${response.data.created} 条，更新 ${response.data.updated} 条`);
           
           // 导入完成后清空表格数据
@@ -475,14 +455,12 @@ class ImportExcel extends Component {
           // 清空Redux中的数据
           this.props.clearExcelData();
         } catch (error) {
-          console.error('导入数据库失败:', error);
           message.error('导入数据库失败，请检查后端服务是否正常');
         } finally {
           this.setState({ loading: false });
         }
       },
       onCancel: () => {
-        console.log('取消导入');
       }
     });
   };
@@ -499,9 +477,7 @@ class ImportExcel extends Component {
         try {
           // 清空后端数据库中的数据
           await clearExcelDataApi();
-          console.log('后端数据清空成功');
         } catch (error) {
-          console.error('清空后端数据失败:', error);
           message.error('清空后端数据失败，请检查后端服务是否正常');
         } finally {
           // 清空Redux中的数据
@@ -522,21 +498,11 @@ class ImportExcel extends Component {
         }
       },
       onCancel: () => {
-        console.log('取消清空');
       }
     });
   };
 
-  // 处理分页变化
-  handlePaginationChange = (current, pageSize) => {
-    console.log('分页变化:', current, pageSize);
-    this.setState({
-      pagination: {
-        current: current,
-        pageSize: pageSize
-      }
-    });
-  };
+  // 处理分页变化已移至 onChange 回调中直接处理
 
   render() {
     const { tableData, tableColumns, loading, importCount } = this.state;
@@ -572,21 +538,15 @@ class ImportExcel extends Component {
                 width: col.width || 100,
                 fixed: col.fixed || false
               }))}
-              dataSource={tableData.slice(
-                (this.state.pagination.current - 1) * this.state.pagination.pageSize,
-                this.state.pagination.current * this.state.pagination.pageSize
-              )}
+              dataSource={tableData}
               scroll={{ x: 6000, y: 'calc(100vh - 400px)' }}
               pagination={{
-                current: this.state.pagination.current,
-                pageSize: this.state.pagination.pageSize,
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50', '100'],
                 showTotal: (total) => `共 ${total} 条数据`,
-                total: importCount,
-                onChange: (current, pageSize) => this.handlePaginationChange(current, pageSize)
+                total: importCount
               }}
-              rowKey={(record, index) => (this.state.pagination.current - 1) * this.state.pagination.pageSize + index}
+              rowKey={(record, index) => index}
               locale={{ emptyText: '暂无导入数据' }}
               size="small"
               onRow={(record, index) => ({

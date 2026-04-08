@@ -1,0 +1,32 @@
+.ant-layout-header {
+  transition: width 0.2s;
+  z-index: 9;
+  position: relative;
+  height: 64px;
+  background: #fff !important;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+}
+.ant-layout-header .right-menu {
+  float: right;
+  line-height: 64px;
+}
+.ant-layout-header .right-menu .dropdown-wrap {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}
+.ant-layout-header .right-menu .dropdown-wrap .ant-dropdown-menu-item {
+  padding: 6px 20px 8px 15px;
+}
+.ant-layout-header .right-menu .dropdown-wrap .ant-dropdown-menu-item i {
+  padding-right: 15px;
+}
+.ant-layout-header .right-menu .dropdown-wrap .anticon-caret-down {
+  vertical-align: middle;
+  padding: 0 0 0 6px;
+}
+.fix-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+}

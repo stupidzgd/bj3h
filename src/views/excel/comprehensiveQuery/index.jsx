@@ -29,7 +29,6 @@ class ComprehensiveQuery extends Component {
       // 调用后端API获取所有数据
       const response = await getExcelData();
       const data = response.data;
-      console.log('后端返回数据总量:', data.length);
       
       // 内容分类映射（使用统一配置）
       const contentCategoryMap = CONTENT_CATEGORY_MAP;
@@ -90,7 +89,6 @@ class ComprehensiveQuery extends Component {
         this.generateColumns();
       });
     } catch (error) {
-      console.error('获取数据失败:', error);
       this.setState({ loading: false });
       message.error('获取数据失败，请检查后端服务是否正常');
     }
@@ -411,12 +409,10 @@ class ComprehensiveQuery extends Component {
           // 重新获取数据
           this.fetchData();
         } catch (error) {
-          console.error('删除数据失败:', error);
           message.error('删除数据失败，请检查后端服务是否正常');
         }
       },
       onCancel: () => {
-        console.log('取消删除');
       }
     });
   };
@@ -439,12 +435,10 @@ class ComprehensiveQuery extends Component {
           // 重新获取数据
           this.fetchData();
         } catch (error) {
-          console.error('批量删除数据失败:', error);
           message.error('批量删除数据失败，请检查后端服务是否正常');
         }
       },
       onCancel: () => {
-        console.log('取消批量删除');
       }
     });
   };
@@ -454,9 +448,6 @@ class ComprehensiveQuery extends Component {
     this.setState({ loading: true });
     
     const filters = this.props.queryFilters;
-    
-    // 输出筛选项参数
-    console.log('查询筛选项参数:', filters);
     
     try {
       // 准备请求参数
@@ -475,8 +466,6 @@ class ComprehensiveQuery extends Component {
       // 调用后端API获取数据
       const response = await queryExcelData(params);
       let filteredData = response.data;
-      
-      console.log('后端返回数据:', filteredData);
       
       // 内容分类映射（使用统一配置）
       const contentCategoryMap = CONTENT_CATEGORY_MAP;
@@ -540,7 +529,6 @@ class ComprehensiveQuery extends Component {
       
       message.success(`查询完成，共 ${filteredData.length} 条数据`);
     } catch (error) {
-      console.error('查询数据失败:', error);
       this.setState({ loading: false });
       message.error('查询数据失败，请检查后端服务是否正常');
     }

@@ -4,11 +4,14 @@ const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 const MediaPublishData = require('../models/MediaPublishData');
 const ProvinceRatio = require('../models/ProvinceRatio');
+const { info, error, warn, debug } = require('../config/logger');
 
 // 获取所有数据
 router.get('/all', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
+    
+    info(`获取所有数据请求，参数: startDate=${startDate}, endDate=${endDate}`);
     
     const where = {};
     
@@ -34,10 +37,11 @@ router.get('/all', async (req, res) => {
         required: false // 使用左连接，确保即使没有关联数据也能返回
       }]
     });
-    console.log('数据库返回数据总量:', data.length);
+    
+    info(`数据库返回数据总量: ${data.length}`);
     res.status(200).json(data);
-  } catch (error) {
-    console.error('获取数据失败:', error);
+  } catch (err) {
+    error('获取数据失败:', err);
     res.status(500).json({ error: '获取数据失败' });
   }
 });
@@ -46,6 +50,8 @@ router.get('/all', async (req, res) => {
 router.post('/query', async (req, res) => {
   try {
     const { platform, department, contentCategory, startDate, endDate, importStartDate, importEndDate, keyword } = req.body;
+    
+    info(`按条件查询数据请求，参数: platform=${platform}, department=${department}, contentCategory=${contentCategory}, startDate=${startDate}, endDate=${endDate}, importStartDate=${importStartDate}, importEndDate=${importEndDate}, keyword=${keyword}`);
     
     const where = {};
     
@@ -99,8 +105,11 @@ router.post('/query', async (req, res) => {
         as: 'provinceRatios'
       }]
     });
+    
+    info(`查询完成，返回数据总量: ${data.length}`);
     res.status(200).json(data);
-  } catch (error) {
+  } catch (err) {
+    error('查询数据失败:', err);
     res.status(500).json({ error: '查询数据失败' });
   }
 });
@@ -108,15 +117,15 @@ router.post('/query', async (req, res) => {
 // 导入数据
 router.post('/import', async (req, res) => {
   try {
-    console.log('收到导入请求:', req.body);
+    info('收到导入请求');
     const { data } = req.body;
     
     if (!Array.isArray(data)) {
-      console.log('数据格式错误:', data);
+      warn('数据格式错误');
       return res.status(400).json({ error: '数据格式错误' });
     }
     
-    console.log('准备导入数据，共', data.length, '条');
+    info(`准备导入数据，共 ${data.length} 条`);
     
     // 开始事务
     const transaction = await sequelize.transaction();
@@ -126,7 +135,7 @@ router.post('/import', async (req, res) => {
       const updatedData = [];
       
       for (const item of data) {
-        console.log('处理数据项:', item.article_id);
+        debug(`处理数据项: ${item.article_id}`);
         // 提取省份数据
         const provinceData = [];
         const provinceKeys = Object.keys(item).filter(key => {
@@ -148,10 +157,6 @@ router.post('/import', async (req, res) => {
           }
         }
         
-        // 使用 upsert 操作，避免唯一索引冲突
-        console.log('执行 upsert 操作');
-        console.log('发布时间:', item.publish_time);
-        
         // 确保发布时间格式正确，避免时区问题
         if (item.publish_time) {
           // 解析日期字符串，确保时区正确
@@ -160,7 +165,7 @@ router.post('/import', async (req, res) => {
           // 调整时区，避免时区偏移
           date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
           item.publish_time = date;
-          console.log('转换后发布时间:', item.publish_time);
+          debug(`转换后发布时间: ${item.publish_time}`);
         }
         
         // 先查找是否存在相同的记录
@@ -180,14 +185,14 @@ router.post('/import', async (req, res) => {
         
         // 记录操作类型
         if (created) {
-          console.log('创建新记录:', item.article_id, item.platform);
+          debug(`创建新记录: ${item.article_id} ${item.platform}`);
           createdData.push({
             article_id: item.article_id,
             platform: item.platform,
             title: item.title
           });
         } else {
-          console.log('更新现有记录:', item.article_id, item.platform);
+          debug(`更新现有记录: ${item.article_id} ${item.platform}`);
           updatedData.push({
             article_id: item.article_id,
             platform: item.platform,
@@ -197,7 +202,7 @@ router.post('/import', async (req, res) => {
         
         // 如果是更新操作，先删除旧的省份占比数据
         if (!created && existingRecord) {
-          console.log('更新操作，删除旧省份数据');
+          debug('更新操作，删除旧省份数据');
           await ProvinceRatio.destroy({
             where: {
               media_publish_id: existingRecord.id
@@ -208,7 +213,7 @@ router.post('/import', async (req, res) => {
         
         // 创建省份数据
         if (provinceData.length > 0) {
-          console.log('创建省份数据，共', provinceData.length, '条');
+          debug(`创建省份数据，共 ${provinceData.length} 条`);
           // 获取正确的media_publish_id
           const publishId = created ? mediaPublish.id : existingRecord.id;
           for (const province of provinceData) {
@@ -219,8 +224,10 @@ router.post('/import', async (req, res) => {
       }
       
       // 提交事务
-      console.log('提交事务');
+      debug('提交事务');
       await transaction.commit();
+      
+      info(`导入完成，共处理 ${data.length} 条数据，其中创建 ${createdData.length} 条，更新 ${updatedData.length} 条`);
       
       // 返回详细的统计信息
       res.status(200).json({
@@ -231,15 +238,15 @@ router.post('/import', async (req, res) => {
         createdRecords: createdData,
         updatedRecords: updatedData
       });
-    } catch (error) {
+    } catch (err) {
       // 回滚事务
-      console.log('事务回滚:', error);
+      error('事务回滚:', err);
       await transaction.rollback();
-      throw error;
+      throw err;
     }
-  } catch (error) {
-    console.log('导入数据失败:', error);
-    res.status(500).json({ error: '导入数据失败', message: error.message });
+  } catch (err) {
+    error('导入数据失败:', err);
+    res.status(500).json({ error: '导入数据失败', message: err.message });
   }
 });
 
@@ -248,6 +255,8 @@ router.put('/update/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
+    
+    info(`更新数据请求，ID: ${id}`);
     
     // 提取省份数据
     const provinceData = updateData.provinceRatios || [];
@@ -278,16 +287,20 @@ router.put('/update/:id', async (req, res) => {
         
         // 提交事务
         await transaction.commit();
+        info(`更新数据成功，ID: ${id}`);
         res.status(200).json({ success: true });
       } else {
         await transaction.rollback();
+        warn(`更新数据失败，ID: ${id} 不存在`);
         res.status(404).json({ error: '数据不存在' });
       }
-    } catch (error) {
+    } catch (err) {
       await transaction.rollback();
-      throw error;
+      error('更新数据事务失败:', err);
+      throw err;
     }
-  } catch (error) {
+  } catch (err) {
+    error('更新数据失败:', err);
     res.status(500).json({ error: '更新数据失败' });
   }
 });
@@ -296,6 +309,8 @@ router.put('/update/:id', async (req, res) => {
 router.delete('/delete/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    info(`删除数据请求，ID: ${id}`);
     
     // 开始事务
     const transaction = await sequelize.transaction();
@@ -316,15 +331,19 @@ router.delete('/delete/:id', async (req, res) => {
       await transaction.commit();
       
       if (deleted) {
+        info(`删除数据成功，ID: ${id}`);
         res.status(200).json({ success: true });
       } else {
+        warn(`删除数据失败，ID: ${id} 不存在`);
         res.status(404).json({ error: '数据不存在' });
       }
-    } catch (error) {
+    } catch (err) {
       await transaction.rollback();
-      throw error;
+      error('删除数据事务失败:', err);
+      throw err;
     }
-  } catch (error) {
+  } catch (err) {
+    error('删除数据失败:', err);
     res.status(500).json({ error: '删除数据失败' });
   }
 });
@@ -332,6 +351,8 @@ router.delete('/delete/:id', async (req, res) => {
 // 清空所有数据
 router.delete('/clear', async (req, res) => {
   try {
+    info('清空所有数据请求');
+    
     // 开始事务
     const transaction = await sequelize.transaction();
     
@@ -343,12 +364,15 @@ router.delete('/clear', async (req, res) => {
       await MediaPublishData.destroy({ where: {}, transaction });
       
       await transaction.commit();
+      info('清空所有数据成功');
       res.status(200).json({ success: true });
-    } catch (error) {
+    } catch (err) {
       await transaction.rollback();
-      throw error;
+      error('清空数据事务失败:', err);
+      throw err;
     }
-  } catch (error) {
+  } catch (err) {
+    error('清空数据失败:', err);
     res.status(500).json({ error: '清空数据失败' });
   }
 });
@@ -359,8 +383,11 @@ router.post('/delete', async (req, res) => {
     const { articleIds } = req.body;
     
     if (!Array.isArray(articleIds) || articleIds.length === 0) {
+      warn('批量删除数据失败：请提供要删除的文章ID列表');
       return res.status(400).json({ error: '请提供要删除的文章ID列表' });
     }
+    
+    info(`批量删除数据请求，共 ${articleIds.length} 个文章ID`);
     
     // 开始事务
     const transaction = await sequelize.transaction();
@@ -403,14 +430,16 @@ router.post('/delete', async (req, res) => {
       // 提交事务
       await transaction.commit();
       
+      info(`批量删除数据成功，共删除 ${articleIds.length} 条数据`);
       res.status(200).json({ message: `成功删除 ${articleIds.length} 条数据` });
-    } catch (error) {
+    } catch (err) {
       // 回滚事务
       await transaction.rollback();
-      throw error;
+      error('批量删除数据事务失败:', err);
+      throw err;
     }
-  } catch (error) {
-    console.error('批量删除数据失败:', error);
+  } catch (err) {
+    error('批量删除数据失败:', err);
     res.status(500).json({ error: '批量删除数据失败' });
   }
 });
