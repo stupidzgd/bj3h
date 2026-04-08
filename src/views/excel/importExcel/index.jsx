@@ -16,21 +16,23 @@ class ImportExcel extends Component {
     backendData: []
   };
   componentDidMount() {
-    // 从 sessionStorage 中恢复数据
-    const savedData = sessionStorage.getItem('importExcelData');
-    if (savedData) {
-      const { tableData, tableHeader, importCount, backendData } = JSON.parse(savedData);
-      // 重新生成表格列，确保 render 函数是实际的函数
-      const tableColumns = this.generateColumns(tableHeader);
-      this.setState({
-        tableData,
-        tableHeader,
-        tableColumns,
-        importCount,
-        backendData
-      });
-    }
-  };
+    // 页面加载时不恢复数据，保持空状态
+    // 数据只在当前页面会话中有效，切换页面后自动清空
+  }
+
+  componentWillUnmount() {
+    // 组件卸载时清空数据
+    this.setState({
+      tableData: [],
+      tableHeader: [],
+      tableColumns: [],
+      importCount: 0,
+      backendData: []
+    });
+    
+    // 清空 Redux 中的数据
+    this.props.clearExcelData();
+  }
   handleSuccess = ({ results, header }) => {
     this.setState({ loading: true });
     
@@ -111,15 +113,6 @@ class ImportExcel extends Component {
       importCount: processedResults.length,
       backendData: backendData,
       loading: false
-    }, () => {
-      // 将数据保存到 sessionStorage 中
-      sessionStorage.setItem('importExcelData', JSON.stringify({
-        tableData: processedResults,
-        tableHeader: header,
-        tableColumns,
-        importCount: processedResults.length,
-        backendData: backendData
-      }));
     });
     
     message.success(`成功解析 ${processedResults.length} 条数据，请确认后点击导入按钮`);
@@ -449,9 +442,6 @@ class ImportExcel extends Component {
             backendData: []
           });
           
-          // 清空 sessionStorage 中的数据
-          sessionStorage.removeItem('importExcelData');
-          
           // 清空Redux中的数据
           this.props.clearExcelData();
         } catch (error) {
@@ -465,37 +455,24 @@ class ImportExcel extends Component {
     });
   };
 
-  // 清空数据
-  handleClearData = async () => {
+  // 重置导入 - 只清空前端数据列表，不清除数据库
+  handleResetImport = () => {
     // 弹出确认对话框
     Modal.confirm({
-      title: '确认清空',
-      content: '确定要清空所有数据吗？',
-      onOk: async () => {
-        this.setState({ loading: true });
+      title: '确认重置',
+      content: '确定要重置导入吗？这将清空当前的数据列表，但不会删除已导入数据库的数据。',
+      onOk: () => {
+        // 清空Redux中的数据
+        this.props.clearExcelData();
         
-        try {
-          // 清空后端数据库中的数据
-          await clearExcelDataApi();
-        } catch (error) {
-          message.error('清空后端数据失败，请检查后端服务是否正常');
-        } finally {
-          // 清空Redux中的数据
-          this.props.clearExcelData();
-          
-          // 清空 sessionStorage 中的数据
-          sessionStorage.removeItem('importExcelData');
-          
-          this.setState({
-            tableData: [],
-            tableHeader: [],
-            tableColumns: [],
-            importCount: 0,
-            backendData: [],
-            loading: false
-          });
-          message.success('数据已清空');
-        }
+        this.setState({
+          tableData: [],
+          tableHeader: [],
+          tableColumns: [],
+          importCount: 0,
+          backendData: []
+        });
+        message.success('已重置导入');
       },
       onCancel: () => {
       }
@@ -516,8 +493,8 @@ class ImportExcel extends Component {
               <Button type="primary" style={{ marginRight: 8 }} onClick={this.handleImportData}>
                 导入数据
               </Button>
-              <Button type="danger" onClick={this.handleClearData}>
-                清空数据
+              <Button type="danger" onClick={this.handleResetImport}>
+                重置导入
               </Button>
             </div>
           )}
