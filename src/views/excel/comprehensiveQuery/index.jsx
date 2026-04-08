@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { setQueryFilters, clearQueryFilters } from "@/store/actions/app";
 import { queryExcelData, getExcelData, deleteExcelData } from "@/api/excel";
 import { debounce } from "@/utils";
+import { CONTENT_CATEGORY_MAP } from "@/config/dictionaries";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -30,14 +31,8 @@ class ComprehensiveQuery extends Component {
       const data = response.data;
       console.log('后端返回数据总量:', data.length);
       
-      // 内容分类映射
-      const contentCategoryMap = {
-        '1': '医院新闻',
-        '2': '医科科普',
-        '3': '就诊信息',
-        '4': '医学前沿',
-        '5': '健康生活'
-      };
+      // 内容分类映射（使用统一配置）
+      const contentCategoryMap = CONTENT_CATEGORY_MAP;
       
       // 处理数据，转换字段名和处理省份占比
       const formattedData = data.map(item => {
@@ -123,10 +118,6 @@ class ComprehensiveQuery extends Component {
       if (index < 3) {
         column.fixed = index === 0 ? 'left' : (index === 1 ? 'left' : 'left');
       }
-      // 导入时间列不固定
-      if (item === '导入时间') {
-        column.width = 180;
-      }
 
       // 特殊列处理
       if (item === '链接') {
@@ -157,7 +148,7 @@ class ComprehensiveQuery extends Component {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               cursor: 'pointer',
-              maxWidth: '530px'
+              maxWidth: '550px'
             }}>
               {text}
             </div>
@@ -171,12 +162,14 @@ class ComprehensiveQuery extends Component {
           return dateA - dateB;
         };
       } else if (item === '导入时间') {
+        column.width = 180;
         column.sorter = (a, b) => {
           const dateA = new Date(a[item]).getTime();
           const dateB = new Date(b[item]).getTime();
           return dateA - dateB;
         };
       } else if (item === '是否首发') {
+        column.width = 100;
         column.sorter = (a, b) => {
           return a[item].localeCompare(b[item]);
         };
@@ -193,6 +186,7 @@ class ComprehensiveQuery extends Component {
           return rateA - rateB;
         };
       } else if (item === '平均播放时长') {
+        column.width = 100;
         column.sorter = (a, b) => {
           // 处理不同格式的时长，如"00:00:00"或数字
           const parseTime = (time) => {
@@ -304,18 +298,30 @@ class ComprehensiveQuery extends Component {
 
   // 获取内容分类选项
   getContentCategoryOptions() {
-    const { tableData } = this.state;
-    const categories = [...new Set(tableData.map(item => item['内容分类']).filter(Boolean))];
-    return categories.map(category => (
-      <Option key={category} value={category}>{category}</Option>
+    // 使用统一的字典配置
+    return Object.entries(CONTENT_CATEGORY_MAP).map(([code, name]) => (
+      <Option key={code} value={code}>{name}</Option>
     ));
   }
 
   // 获取科室分类选项
   getDepartmentCategoryOptions() {
     const { tableData } = this.state;
-    const categories = [...new Set(tableData.map(item => item['科室分类']).filter(Boolean))];
-    return categories.map(category => (
+    const categories = new Set();
+    
+    tableData.forEach(item => {
+      if (item['科室分类']) {
+        // 拆分科室分类（如果包含顿号）
+        const deptCategories = item['科室分类'].split('、');
+        deptCategories.forEach(dept => {
+          if (dept.trim()) {
+            categories.add(dept.trim());
+          }
+        });
+      }
+    });
+    
+    return Array.from(categories).map(category => (
       <Option key={category} value={category}>{category}</Option>
     ));
   }
@@ -472,14 +478,8 @@ class ComprehensiveQuery extends Component {
       
       console.log('后端返回数据:', filteredData);
       
-      // 内容分类映射
-      const contentCategoryMap = {
-        '1': '医院新闻',
-        '2': '医科科普',
-        '3': '就诊信息',
-        '4': '医学前沿',
-        '5': '健康生活'
-      };
+      // 内容分类映射（使用统一配置）
+      const contentCategoryMap = CONTENT_CATEGORY_MAP;
       
       // 处理provinceRatios字段，避免直接渲染对象
       filteredData = filteredData.map(item => {
@@ -653,7 +653,7 @@ class ComprehensiveQuery extends Component {
               bordered
               columns={tableColumns}
               dataSource={tableData}
-              scroll={{ x: 6000, y: 'calc(100vh - 450px)' }}
+              scroll={{ x: 5000, y: 'calc(100vh - 450px)' }}
               pagination={{
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50', '100'],

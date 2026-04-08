@@ -46,3 +46,11 @@ export function addUser(data) {
     data
   })
 }
+
+export function updateProfile(data) {
+  return request({
+    url: '/updateProfile',
+    method: 'post',
+    data
+  })
+}

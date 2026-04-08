@@ -25,15 +25,8 @@ class Meun extends Component {
 
   // filterMenuItem用来根据配置信息筛选可以显示的菜单项
   filterMenuItem = (item) => {
-    const { roles } = item;
-    const { role } = this.props;
-    if (role === "admin" || !roles || roles.includes(role)) {
-      return true;
-    } else if (item.children) {
-      // 如果当前用户有此item的某个子item的权限
-      return !!item.children.find((child) => roles.includes(child.role));
-    }
-    return false;
+    // 注释掉权限控制逻辑，显示所有菜单
+    return true;
   };
   // 菜单渲染
   getMenuNodes = (menuList) => {

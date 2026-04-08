@@ -4,6 +4,10 @@ const initUserInfo = {
   name: "",
   role: "",
   avatar:"",
+  id: "",
+  username: "",
+  password: "",
+  description: "",
   token: getToken(),
 };
 export default function user(state = initUserInfo, action) {
@@ -19,6 +23,10 @@ export default function user(state = initUserInfo, action) {
         name: action.name,
         role: action.role,
         avatar: action.avatar,
+        id: action.id,
+        username: action.username,
+        password: action.password,
+        description: action.description,
       };
     case types.USER_RESET_USER:
       return {};

@@ -5,6 +5,7 @@ import moment from "moment";
 import { setExcelData, clearExcelData } from "@/store/actions/app";
 import { importExcel as importExcelApi, clearExcelData as clearExcelDataApi } from "@/api/excel";
 import UploadExcelComponent from "@/components/UploadExcel";
+import { PLATFORM_MAP, CONTENT_CATEGORY_REVERSE_MAP } from "@/config/dictionaries";
 class ImportExcel extends Component {
   state = {
     tableData: [],
@@ -53,31 +54,11 @@ class ImportExcel extends Component {
     this.props.setExcelData(processedResults);
     console.log('存储到Redux的数据长度:', processedResults.length);
     
-    // 平台字典映射
-    const platformMap = {
-      '自媒体（微信订阅号）': 'A',
-      '自媒体（微信视频号）': 'B',
-      '自媒体（微博）': 'C',
-      '自媒体（快手）': 'D',
-      '自媒体（抖音）': 'E',
-      '自媒体（B站）': 'F',
-      '自媒体（小红书）': 'G',
-      '自媒体（喜马拉雅）': 'H',
-      '自媒体（官网）': 'I',
-      '媒体（电视）': 'J',
-      '媒体（网络）': 'K',
-      '媒体（报刊）': 'L',
-      '媒体（音频）': 'M'
-    };
+    // 平台字典映射（使用统一配置）
+    const platformMap = PLATFORM_MAP;
 
-    // 内容分类字典映射
-    const contentCategoryMap = {
-      '医院新闻': '1',
-      '医科科普': '2',
-      '就诊信息': '3',
-      '医疗技术': '4',
-      '其他': '5'
-    };
+    // 内容分类字典映射（使用统一配置）
+    const contentCategoryMap = CONTENT_CATEGORY_REVERSE_MAP;
     
     // 转换数据格式，适配后端数据库
     const backendData = processedResults.map(item => {
@@ -547,12 +528,12 @@ class ImportExcel extends Component {
   };
 
   // 处理分页变化
-  handlePaginationChange = (pagination) => {
-    console.log('分页变化:', pagination);
+  handlePaginationChange = (current, pageSize) => {
+    console.log('分页变化:', current, pageSize);
     this.setState({
       pagination: {
-        current: pagination.current,
-        pageSize: pagination.pageSize
+        current: current,
+        pageSize: pageSize
       }
     });
   };
@@ -591,7 +572,10 @@ class ImportExcel extends Component {
                 width: col.width || 100,
                 fixed: col.fixed || false
               }))}
-              dataSource={tableData}
+              dataSource={tableData.slice(
+                (this.state.pagination.current - 1) * this.state.pagination.pageSize,
+                this.state.pagination.current * this.state.pagination.pageSize
+              )}
               scroll={{ x: 6000, y: 'calc(100vh - 400px)' }}
               pagination={{
                 current: this.state.pagination.current,
@@ -600,9 +584,9 @@ class ImportExcel extends Component {
                 pageSizeOptions: ['10', '20', '50', '100'],
                 showTotal: (total) => `共 ${total} 条数据`,
                 total: importCount,
-                onChange: this.handlePaginationChange
+                onChange: (current, pageSize) => this.handlePaginationChange(current, pageSize)
               }}
-              rowKey={(record, index) => index}
+              rowKey={(record, index) => (this.state.pagination.current - 1) * this.state.pagination.pageSize + index}
               locale={{ emptyText: '暂无导入数据' }}
               size="small"
               onRow={(record, index) => ({

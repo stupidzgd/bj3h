@@ -29,8 +29,11 @@ const Login = (props) => {
   // 获取用户信息
   const handleUserInfo = (token) => {
     getUserInfo(token)
-      .then((data) => {})
+      .then((data) => {
+        setLoading(false);
+      })
       .catch((error) => {
+        setLoading(false);
         message.error(error);
       });
   };
@@ -70,8 +73,7 @@ const Login = (props) => {
                     whitespace: true,
                     message: "请输入用户名",
                   },
-                ],
-                initialValue: "admin", // 初始值
+                ]
               })(
                 <Input
                   prefix={
@@ -89,8 +91,7 @@ const Login = (props) => {
                     whitespace: true,
                     message: "请输入密码",
                   },
-                ],
-                initialValue: "123456", // 初始值
+                ]
               })(
                 <Input
                   prefix={

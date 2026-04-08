@@ -23,6 +23,10 @@ const LayoutContent = (props) => {
   const { pathname } = location;
   const handleFilter = (route) => {
     // 过滤没有权限的页面
+    // 当 role 为 undefined 或空字符串时，暂时允许访问所有路由，等待 role 获取完成
+    if (role === undefined || role === "") {
+      return true;
+    }
     return role === "admin" || !route.roles || route.roles.includes(role);
   };
   return (

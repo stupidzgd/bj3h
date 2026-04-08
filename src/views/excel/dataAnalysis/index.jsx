@@ -6,8 +6,13 @@ import { debounce } from "@/utils";
 import moment from "moment";
 import * as XLSX from "xlsx";
 import { getAnalysisData } from "@/api/excel";
+import { CONTENT_CATEGORY_MAP } from "@/config/dictionaries";
+import NoData from "@/components/NoData";
 
 const { TabPane } = Tabs;
+
+// 内容分类反向映射（使用统一配置）
+const contentCategoryMap = CONTENT_CATEGORY_MAP;
 
 class DataAnalysis extends Component {
   state = {
@@ -712,10 +717,12 @@ class DataAnalysis extends Component {
     analysisData.forEach(item => {
       if (item['内容分类']) {
         const content = item['内容分类'];
-        if (!contentData[content]) {
-          contentData[content] = 0;
+        // 使用反向映射将数字转换为分类名称
+        const displayContent = contentCategoryMap[content] || content;
+        if (!contentData[displayContent]) {
+          contentData[displayContent] = 0;
         }
-        contentData[content]++;
+        contentData[displayContent]++;
       }
     });
 
@@ -761,10 +768,12 @@ class DataAnalysis extends Component {
     analysisData.forEach(item => {
       if (item['内容分类']) {
         const content = item['内容分类'];
-        if (!contentData[content]) {
-          contentData[content] = 0;
+        // 使用反向映射将数字转换为分类名称
+        const displayContent = contentCategoryMap[content] || content;
+        if (!contentData[displayContent]) {
+          contentData[displayContent] = 0;
         }
-        contentData[content]++;
+        contentData[displayContent]++;
       }
     });
 
@@ -2560,11 +2569,7 @@ class DataAnalysis extends Component {
             <Tabs defaultActiveKey="time" onChange={this.handleTabChange} activeKey={this.state.activeTab}>
               <TabPane tab="时间维度" key="time">
                 {!loading && this.state.analysisData.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                  </div>
+                  <NoData style={{ padding: '60px 0' }} />
                 ) : (
                   <div style={{ marginBottom: 16 }}>
                     <h3>按月份发布数量分析</h3>
@@ -2579,11 +2584,7 @@ class DataAnalysis extends Component {
               </TabPane>
               <TabPane tab="平台维度" key="platform">
                 {!loading && this.state.analysisData.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                  </div>
+                  <NoData style={{ padding: '60px 0' }} />
                 ) : (
                   <div style={{ marginBottom: 16 }}>
                     <h3>各平台发布数量分析</h3>
@@ -2604,11 +2605,7 @@ class DataAnalysis extends Component {
               </TabPane>
               <TabPane tab="是否首发" key="first-release">
                 {!loading && this.state.analysisData.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                  </div>
+                  <NoData style={{ padding: '60px 0' }} />
                 ) : (
                   <div style={{ marginBottom: 16 }}>
                     <h3>是否首发分析</h3>
@@ -2623,11 +2620,7 @@ class DataAnalysis extends Component {
               </TabPane>
               <TabPane tab="内容维度" key="content">
                 {!loading && this.state.analysisData.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                  </div>
+                  <NoData style={{ padding: '60px 0' }} />
                 ) : (
                   <div style={{ marginBottom: 16 }}>
                     <h3>内容分类发布数量</h3>
@@ -2642,11 +2635,7 @@ class DataAnalysis extends Component {
               </TabPane>
               <TabPane tab="影响力维度" key="influence">
                 {!loading && this.state.analysisData.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                  </div>
+                  <NoData style={{ padding: '60px 0' }} />
                 ) : (
                   <div style={{ marginBottom: 16 }}>
                     <h3>影响力分析</h3>
@@ -2656,11 +2645,7 @@ class DataAnalysis extends Component {
               </TabPane>
               <TabPane tab="用户维度" key="user">
                 {!loading && this.state.analysisData.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                  </div>
+                  <NoData style={{ padding: '60px 0' }} />
                 ) : (
                   <div style={{ marginBottom: 16 }}>
                     <h3>用户地域分布</h3>
@@ -2689,11 +2674,7 @@ class DataAnalysis extends Component {
                 }}>
                   <TabPane tab="科室名称" key="department-name">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>科室名称分析</h3>
@@ -2703,11 +2684,7 @@ class DataAnalysis extends Component {
                   </TabPane>
                   <TabPane tab="科室分类" key="department-category">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>科室分类分析</h3>
@@ -2724,11 +2701,7 @@ class DataAnalysis extends Component {
                   </TabPane>
                   <TabPane tab="作者" key="author">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>作者分析</h3>
@@ -2738,11 +2711,7 @@ class DataAnalysis extends Component {
                   </TabPane>
                   <TabPane tab="记者" key="reporter">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>记者分析</h3>
@@ -2752,11 +2721,7 @@ class DataAnalysis extends Component {
                   </TabPane>
                   <TabPane tab="具体栏目" key="media-column">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>具体栏目分析</h3>
@@ -2766,11 +2731,7 @@ class DataAnalysis extends Component {
                   </TabPane>
                   <TabPane tab="体裁分类" key="genre-category">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>体裁分类分析</h3>
@@ -2787,11 +2748,7 @@ class DataAnalysis extends Component {
                   </TabPane>
                   <TabPane tab="视频时长" key="video-duration">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>视频时长分析</h3>
@@ -2801,11 +2758,7 @@ class DataAnalysis extends Component {
                   </TabPane>
                   <TabPane tab="专项策划" key="special-planning">
                     {!loading && this.state.analysisData.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                        <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                        <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                        <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                      </div>
+                      <NoData style={{ padding: '60px 0' }} />
                     ) : (
                       <div style={{ marginBottom: 16 }}>
                         <h3>专项策划分析</h3>
@@ -2817,11 +2770,7 @@ class DataAnalysis extends Component {
               </TabPane>
               <TabPane tab="互动外延" key="interaction">
                 {!loading && this.state.analysisData.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                    <div style={{ fontSize: '48px', color: '#f0f0f0', marginBottom: '16px' }}>📊</div>
-                    <div style={{ fontSize: '16px', color: '#999', marginBottom: '8px' }}>暂无查询数据</div>
-                    <div style={{ fontSize: '14px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
-                  </div>
+                  <NoData style={{ padding: '60px 0' }} />
                 ) : (
                   <div style={{ marginBottom: 16 }}>
                     <h3>互动外延分析</h3>

@@ -8,6 +8,8 @@ import RaddarChart from "./components/RaddarChart";
 import PieChart from "./components/PieChart";
 import TransactionTable from "./components/TransactionTable";
 import { getAnalysisData } from "@/api/excel";
+import { CONTENT_CATEGORY_MAP, PLATFORM_REVERSE_MAP } from "@/config/dictionaries";
+import NoData from "@/components/NoData";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -106,14 +108,8 @@ const Dashboard = () => {
 
       // 3. 内容分类分析
       const contentMap = {};
-      // 内容分类映射表
-      const contentCategoryMap = {
-        '1': '新闻资讯',
-        '2': '学术研究',
-        '3': '医学科普',
-        '4': '健康生活',
-        '5': '政策法规'
-      };
+      // 内容分类映射表（使用统一配置）
+      const contentCategoryMap = CONTENT_CATEGORY_MAP;
       data.forEach(item => {
         let category = item.content_category || item['内容分类'] || '未知';
         // 将数字分类转换为具体名称
@@ -192,15 +188,26 @@ const Dashboard = () => {
       const hotArticlesList = data
         .sort((a, b) => (b.reading_count || b['阅读量'] || 0) - (a.reading_count || a['阅读量'] || 0))
         .slice(0, 10)
-        .map((item, index) => ({
-          key: index + 1,
-          rank: index + 1,
-          title: item.title || item['标题'] || '',
-          platform: item.platform || item['平台'] || '',
-          publishTime: item.publish_time || item['发布时间'] || '',
-          reads: item.reading_count || item['阅读量'] || 0,
-          shares: item.share_count || item['分享量'] || 0
-        }));
+        .map((item, index) => {
+          let publishTime = item.publish_time || item['发布时间'] || '';
+          // 格式化时间，去除末尾的000Z
+          if (publishTime) {
+            try {
+              publishTime = moment(publishTime).format('YYYY-MM-DD HH:mm:ss');
+            } catch (error) {
+              console.error('时间格式化错误:', error);
+            }
+          }
+          return {
+            key: index + 1,
+            rank: index + 1,
+            title: item.title || item['标题'] || '',
+            platform: item.platform || item['平台'] || '',
+            publishTime: publishTime,
+            reads: item.reading_count || item['阅读量'] || 0,
+            shares: item.share_count || item['分享量'] || 0
+          };
+        });
 
       // 更新状态
       setStats({
@@ -376,9 +383,7 @@ const Dashboard = () => {
                   styles={{ height: '300px' }}
                 />
               ) : (
-                <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
-                  暂无足够数据
-                </div>
+                <NoData style={{ height: '300px' }} />
               )}
             </Card>
           </Col>

@@ -189,7 +189,7 @@ const menuList = [
     icon: "copy",
     roles:["admin","editor"]
   },
-  {
+{
     title: "用户管理",
     path: "/user",
     icon: "usergroup-add",

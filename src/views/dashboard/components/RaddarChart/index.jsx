@@ -3,6 +3,7 @@ import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import echarts from "@/lib/echarts";
 import { debounce } from "@/utils";
+import NoData from "@/components/NoData";
 
 class RaddarChart extends Component {
   static propTypes = {
@@ -254,17 +255,31 @@ class RaddarChart extends Component {
   }
 
   render() {
-    const { className, height, width, styles } = this.props;
+    const { className, height, width, styles, chartData } = this.props;
+    const hasData = chartData && chartData.length > 0;
+    
     return (
       <div
         className={className}
-        ref={(el) => (this.el = el)}
         style={{
           ...styles,
           height,
           width,
+          position: 'relative'
         }}
-      />
+      >
+        {hasData ? (
+          <div
+            ref={(el) => (this.el = el)}
+            style={{
+              height: '100%',
+              width: '100%',
+            }}
+          />
+        ) : (
+          <NoData />
+        )}
+      </div>
     );
   }
 }

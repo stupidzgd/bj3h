@@ -7,9 +7,8 @@
   background-size: cover;
   background-position: center;
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding-bottom: 10%;
+  align-items: center;
+  justify-content: center;
   & > .title {
     color: #eee;
     font-size: 26px;
@@ -32,12 +31,13 @@
     z-index: 999;
   }
   .content {
-    margin-right: 10%;
     background-color: #fff;
-    width: 360px;
+    width: 90%;
+    max-width: 360px;
     padding: 40px 30px;
     box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    margin-top: 180px;
 
     .title {
       text-align: center;
@@ -63,5 +63,19 @@
     .login-form-forgot {
       float: right;
     }
+  }
+}
+
+// 响应式调整
+@media (min-width: 768px) {
+  .login-container {
+    justify-content: flex-end;
+    padding-right: 10%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .login-container {
+    padding-right: 15%;
   }
 }
