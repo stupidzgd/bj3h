@@ -28,7 +28,7 @@ class ComprehensiveQuery extends Component {
     try {
       // 调用后端API获取所有数据
       const response = await getExcelData();
-      const data = response.data;
+      const data = response.data.data;
       
       // 内容分类映射（使用统一配置）
       const contentCategoryMap = CONTENT_CATEGORY_MAP;

@@ -7,7 +7,6 @@ export function getToken() {
 }
 
 export function setToken(token) {
-  // 设置12小时过期时间
   return Cookies.set(TokenKey, token, { expires: 12 / 24 })
 }
 

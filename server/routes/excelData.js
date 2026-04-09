@@ -38,8 +38,20 @@ router.get('/all', async (req, res) => {
       }]
     });
     
+    // 获取最大的 import_time
+    let lastUpdateTime = null;
+    if (data.length > 0) {
+      const maxImportTime = await MediaPublishData.max('import_time', { where });
+      if (maxImportTime) {
+        lastUpdateTime = maxImportTime.toISOString().slice(0, 19).replace('T', ' ');
+      }
+    }
+    
     info(`数据库返回数据总量: ${data.length}`);
-    res.status(200).json(data);
+    res.status(200).json({
+      data: data,
+      lastUpdateTime: lastUpdateTime
+    });
   } catch (err) {
     error('获取数据失败:', err);
     res.status(500).json({ error: '获取数据失败' });

@@ -35,6 +35,7 @@ const Dashboard = () => {
     interactionStats: []
   });
   const [hotArticles, setHotArticles] = useState([]);
+  const [lastUpdateTime, setLastUpdateTime] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -49,8 +50,9 @@ const Dashboard = () => {
         params.endDate = moment(dateRange[1]).format('YYYY-MM-DD');
       }
       const response = await getAnalysisData(params);
-      if (response.data && response.data.length > 0) {
-        processData(response.data);
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        processData(response.data.data);
+        setLastUpdateTime(response.data.lastUpdateTime || null);
       } else {
         // 当没有数据时，重置所有状态
         setStats({
@@ -70,6 +72,7 @@ const Dashboard = () => {
           interactionStats: []
         });
         setHotArticles([]);
+        setLastUpdateTime(null);
       }
     } catch (error) {
       console.error('获取数据失败:', error);
@@ -438,7 +441,7 @@ const Dashboard = () => {
             <Card>
               <Statistic 
                 title="数据更新时间" 
-                value={moment().format('YYYY-MM-DD HH:mm:ss')} 
+                value={lastUpdateTime || moment().format('YYYY-MM-DD HH:mm:ss')} 
                 prefix="⏰"
               />
             </Card>

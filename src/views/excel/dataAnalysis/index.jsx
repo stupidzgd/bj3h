@@ -56,11 +56,11 @@ class DataAnalysis extends Component {
       };
       
       const response = await getAnalysisData(params);
-      console.log('从后端获取的数据长度:', response.data.length);
-      console.log('从后端获取的数据前5条:', response.data.slice(0, 5));
+      console.log('从后端获取的数据长度:', response.data.data.length);
+      console.log('从后端获取的数据前5条:', response.data.data.slice(0, 5));
       
       // 转换数据格式，适配前端需要的格式
-      const formattedData = response.data.map(item => {
+      const formattedData = response.data.data.map(item => {
         // 转换字段名，从 snake_case 转换为 中文
         const formattedItem = {
           '平台': item.platform || '',
@@ -2550,6 +2550,18 @@ class DataAnalysis extends Component {
         <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2>数据分析</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <RangePicker 
+              onChange={this.handleDateRangeChange} 
+              value={dateRange}
+              placeholder={['开始日期', '结束日期']}
+            />
+            <Button 
+              type="default" 
+              onClick={this.fetchData}
+              disabled={loading}
+            >
+              查询
+            </Button>
             <Button 
               type="primary" 
               onClick={() => this.exportToExcel(activeTab)}
@@ -2557,11 +2569,6 @@ class DataAnalysis extends Component {
             >
               导出Excel
             </Button>
-            <RangePicker 
-              onChange={this.handleDateRangeChange} 
-              value={dateRange}
-              placeholder={['开始日期', '结束日期']}
-            />
           </div>
         </div>
         <Card>
