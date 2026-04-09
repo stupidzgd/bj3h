@@ -5,7 +5,7 @@ const Logo = () => {
   return (
     <div className="sidebar-logo-container">
       <img src={logo} className="sidebar-logo" alt="logo" />
-      <h1 className="sidebar-title">数据分析</h1>
+      <h1 className="sidebar-title">媒体数据分析</h1>
     </div>
   );
 };

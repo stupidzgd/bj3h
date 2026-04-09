@@ -176,6 +176,19 @@ const menuList = [
       },
     ],
   },
+  {
+    title: "系统测试",
+    path: "/system",
+    icon: "setting",
+    roles:["admin"],
+    children: [
+      {
+        title: "系统测试",
+        path: "/system/test",
+        roles:["admin"]
+      },
+    ],
+  },
   /*
   {
     title: "Zip",

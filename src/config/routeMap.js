@@ -27,6 +27,7 @@ const User = Loadable({loader: () => import(/*webpackChunkName:'User'*/'@/views/
 const ImportExcel = Loadable({ loader: () => import(/*webpackChunkName:'ImportExcel'*/'@/views/excel/importExcel'),loading: Loading });
 const DataAnalysis = Loadable({ loader: () => import(/*webpackChunkName:'DataAnalysis'*/'@/views/excel/dataAnalysis'),loading: Loading });
 const ComprehensiveQuery = Loadable({ loader: () => import(/*webpackChunkName:'ComprehensiveQuery'*/'@/views/excel/comprehensiveQuery'),loading: Loading });
+const SystemTest = Loadable({ loader: () => import(/*webpackChunkName:'SystemTest'*/'@/views/system/systemTest'),loading: Loading });
 
 export default [
   { path: "/dashboard", component: Dashboard, roles: ["admin","editor","guest"] },
@@ -50,6 +51,7 @@ export default [
   // { path: "/excel/upload", component: UploadExcel, roles: ["admin","editor"] },
   { path: "/analysis/overview", component: DataAnalysis, roles: ["admin","editor"] },
   { path: "/analysis/comprehensive", component: ComprehensiveQuery, roles: ["admin","editor"] },
+  { path: "/system/test", component: SystemTest, roles: ["admin"] },
   // { path: "/zip", component: Zip, roles: ["admin","editor"] },
   // { path: "/clipboard", component: Clipboard, roles: ["admin","editor"] },
   { path: "/user", component: User, roles: ["admin"] },
