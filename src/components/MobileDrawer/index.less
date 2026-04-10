@@ -7,13 +7,15 @@
 
   .ant-drawer-body {
     padding: 0;
-    height: 100%;
+    height: calc(100% - 64px); /* 减去header高度 */
     overflow-y: auto;
   }
 
   .ant-drawer-header {
     padding: 16px;
     border-bottom: 1px solid #e8e8e8;
+    height: 64px;
+    box-sizing: border-box;
   }
 }
 
@@ -85,6 +87,39 @@ body:not(.ant-drawer-open) {
   height: 100% !important;
   z-index: 1001 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-  background: #fff !important;
+  background: #2b2f3a !important;
   overflow: hidden !important;
+}
+
+// 移动端菜单样式
+.mobile-drawer {
+  .ant-drawer-header {
+    background: #2b2f3a !important;
+    border-bottom: 1px solid #404657 !important;
+  }
+  
+  .ant-menu {
+    background: #2b2f3a !important;
+  }
+  
+  .ant-menu-item {
+    color: #fff !important;
+  }
+  
+  .ant-menu-item-selected {
+    background-color: #1890ff !important;
+    color: #fff !important;
+  }
+  
+  .ant-menu-submenu-title {
+    color: #fff !important;
+  }
+  
+  .ant-menu-submenu-selected {
+    color: #fff !important;
+  }
+  
+  .anticon {
+    color: #fff !important;
+  }
 }

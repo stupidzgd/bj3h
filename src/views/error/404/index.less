@@ -1,15 +1,69 @@
 .not-found{
   background-color: #f0f2f5;
-  height: 100%;
+  min-height: 100vh;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    margin-bottom: 10px;
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      max-height: 200px;
+    }
+  }
+  
   .right {
-    padding-left: 50px;
-    margin-top: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 0;
+    margin-bottom: 20px;
+    
     h1 {
       font-size: 35px;
+      margin-bottom: 10px;
     }
+    
     h2 {
       margin-bottom: 20px;
       font-size: 20px;
+    }
+  }
+  
+  // 移动端样式
+  @media screen and (max-width: 768px) {
+    padding: 10px;
+    min-height: calc(100vh - 150px); /* 减去header高度 */
+    
+    .image-container {
+      margin-bottom: 5px;
+      
+      img {
+        max-height: 150px;
+      }
+    }
+    
+    .right {
+      margin-bottom: 10px;
+      
+      h1 {
+        font-size: 28px;
+      }
+      
+      h2 {
+        font-size: 16px;
+      }
     }
   }
 }

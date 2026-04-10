@@ -7,11 +7,11 @@ const NotFound = (props) => {
   const { history } = props;
   const goHome = () => history.replace("/");
   return (
-    <Row className="not-found">
-      <Col span={12}>
+    <Row className="not-found" type="flex" justify="center" align="middle">
+      <Col xs={24} sm={24} md={12} lg={12} xl={12} className="image-container">
         <img src={errImg} alt="404" />
       </Col>
-      <Col span={12} className="right">
+      <Col xs={24} sm={24} md={12} lg={12} xl={12} className="right">
         <h1>404</h1>
         <h2>抱歉，你访问的页面不存在</h2>
         <div>
