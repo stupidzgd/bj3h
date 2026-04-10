@@ -317,9 +317,9 @@ const Dashboard = () => {
         </Row>
 
         {/* 数据趋势选择器 */}
-        <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>数据分析概览</h2>
-          <div style={{ display: 'flex', gap: 16 }}>
+        <div className="data-analysis-overview" style={{ marginBottom: 24, padding: 16, border: '1px solid #e8e8e8', borderRadius: 8, backgroundColor: '#f9f9f9' }}>
+          <h2 style={{ marginBottom: 16, color: '#1890ff' }}>数据分析概览</h2>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <Select 
               value={timeRange} 
               onChange={handleTimeRangeChange}
@@ -333,7 +333,8 @@ const Dashboard = () => {
             <RangePicker 
               value={dateRange}
               onChange={handleDateRangeChange}
-              style={{ width: 300 }}
+              style={{ width: '100%', maxWidth: 300 }}
+              popupStyle={{ zIndex: 1050 }}
             />
           </div>
         </div>
@@ -405,12 +406,23 @@ const Dashboard = () => {
           <TransactionTable 
             dataSource={hotArticles}
             columns={[
-              { title: '排名', dataIndex: 'rank', key: 'rank' },
-              { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true },
-              { title: '平台', dataIndex: 'platform', key: 'platform' },
-              { title: '发布时间', dataIndex: 'publishTime', key: 'publishTime' },
-              { title: '阅读量', dataIndex: 'reads', key: 'reads' },
-              { title: '分享量', dataIndex: 'shares', key: 'shares' }
+              { title: '排名', dataIndex: 'rank', key: 'rank', width: 60 },
+              { 
+                title: '标题', 
+                dataIndex: 'title', 
+                key: 'title', 
+                ellipsis: true,
+                width: 300,
+                render: (text) => (
+                  <span title={text} style={{ display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {text}
+                  </span>
+                )
+              },
+              { title: '平台', dataIndex: 'platform', key: 'platform', width: 100 },
+              { title: '发布时间', dataIndex: 'publishTime', key: 'publishTime', width: 150 },
+              { title: '阅读量', dataIndex: 'reads', key: 'reads', width: 100, align: 'right' },
+              { title: '分享量', dataIndex: 'shares', key: 'shares', width: 100, align: 'right' }
             ]}
           />
         </Card>

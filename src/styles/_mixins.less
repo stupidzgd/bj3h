@@ -1,0 +1,83 @@
+// 移动端适配混入
+
+// 响应式字体大小
+.responsive-font-size(@size) {
+  font-size: @size;
+  @media (max-width: @mobile-breakpoint) {
+    font-size: @size * 0.9;
+  }
+}
+
+// 响应式间距
+.responsive-padding(@padding) {
+  padding: @padding;
+  @media (max-width: @mobile-breakpoint) {
+    padding: @padding * 0.8;
+  }
+}
+
+// 响应式边距
+.responsive-margin(@margin) {
+  margin: @margin;
+  @media (max-width: @mobile-breakpoint) {
+    margin: @margin * 0.8;
+  }
+}
+
+// 触摸友好按钮
+.touch-friendly-button() {
+  min-height: @mobile-button-height;
+  min-width: 80px;
+  padding: 0 @mobile-padding-md;
+  font-size: @mobile-font-size;
+}
+
+// 响应式容器
+.responsive-container() {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  @media (max-width: @mobile-breakpoint) {
+    padding: 0 @mobile-padding-sm;
+  }
+}
+
+// 横向滚动容器
+.horizontal-scroll() {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+// 垂直滚动容器
+.vertical-scroll() {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}

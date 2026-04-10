@@ -3,6 +3,7 @@ import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import echarts from "@/lib/echarts";
 import { debounce } from "@/utils";
+import { isSmallScreen } from "@/utils/device";
 import NoData from "@/components/NoData";
 
 class LineChart extends Component {
@@ -63,6 +64,7 @@ class LineChart extends Component {
   setOptions({ expectedData, actualData } = {}) {
     const defaultData = [120, 82, 91, 154, 162, 140, 145];
     const data = expectedData || defaultData;
+    const isMobile = isSmallScreen();
     
     this.state.chart.setOption({
       backgroundColor: "#fff",
@@ -72,12 +74,16 @@ class LineChart extends Component {
         axisTick: {
           show: false,
         },
+        axisLabel: {
+          fontSize: isMobile ? 10 : 12,
+          rotate: isMobile ? 45 : 0,
+        },
       },
       grid: {
-        left: 10,
-        right: 10,
-        bottom: 10,
-        top: 30,
+        left: isMobile ? 15 : 10,
+        right: isMobile ? 15 : 10,
+        bottom: isMobile ? 20 : 10,
+        top: isMobile ? 40 : 30,
         containLabel: true,
       },
       tooltip: {
@@ -86,14 +92,23 @@ class LineChart extends Component {
           type: "cross",
         },
         padding: [5, 10],
+        textStyle: {
+          fontSize: isMobile ? 12 : 14,
+        },
       },
       yAxis: {
         axisTick: {
           show: false,
         },
+        axisLabel: {
+          fontSize: isMobile ? 10 : 12,
+        },
       },
       legend: {
         data: ["阅读量"],
+        textStyle: {
+          fontSize: isMobile ? 12 : 14,
+        },
       },
       series: [
         {
@@ -105,7 +120,7 @@ class LineChart extends Component {
               color: "#3888fa",
               lineStyle: {
                 color: "#3888fa",
-                width: 2,
+                width: isMobile ? 1.5 : 2,
               },
               areaStyle: {
                 color: "#f3f8ff",
@@ -117,6 +132,18 @@ class LineChart extends Component {
           animationEasing: "quadraticOut",
         },
       ],
+      // 移动端手势操作
+      dataZoom: isMobile ? [
+        {
+          type: 'inside',
+          start: 0,
+          end: 100,
+        },
+        {
+          start: 0,
+          end: 100,
+        },
+      ] : [],
     });
   }
 

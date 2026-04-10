@@ -8,6 +8,8 @@ import FullScreen from "@/components/FullScreen";
 import Settings from "@/components/Settings";
 import Hamburger from "@/components/Hamburger";
 import BreadCrumb from "@/components/BreadCrumb";
+import MobileDrawer from "@/components/MobileDrawer";
+import { isSmallScreen } from "@/utils/device";
 import "./index.less";
 const { Header } = Layout;
 const { TextArea } = Input;
@@ -19,6 +21,7 @@ class LayoutHeader extends React.Component {
     this.state = {
       modalVisible: false,
       modalLoading: false,
+      mobileDrawerVisible: false,
       passwordKey: 0, // 用于重置密码输入框状态的key
       confirmPasswordKey: 0, // 用于重置密码确认输入框状态的key
     };
@@ -29,6 +32,23 @@ class LayoutHeader extends React.Component {
     if (token) {
       getUserInfo(token);
     }
+    // 监听窗口大小变化
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    // 移除窗口大小变化监听
+    window.removeEventListener('resize', this.handleResize);
+    // 清理 body 样式，防止残留
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+  }
+
+  // 处理窗口大小变化
+  handleResize = () => {
+    // 当窗口大小变化时，强制重新渲染组件
+    this.forceUpdate();
   }
 
   componentDidUpdate(prevProps) {
@@ -128,6 +148,24 @@ class LayoutHeader extends React.Component {
     });
   };
 
+  // 打开移动端抽屉菜单
+  handleOpenMobileDrawer = () => {
+    this.setState({ mobileDrawerVisible: true }, () => {
+      // 打开抽屉时禁止页面滚动
+      document.body.style.overflow = 'hidden';
+    });
+  };
+
+  // 关闭移动端抽屉菜单
+  handleCloseMobileDrawer = () => {
+    this.setState({ mobileDrawerVisible: false }, () => {
+      // 确保抽屉关闭后页面恢复正常滚动
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    });
+  };
+
   onClick = ({ key }) => {
     const { token } = this.props;
     switch (key) {
@@ -164,7 +202,7 @@ class LayoutHeader extends React.Component {
   };
 
   render() {
-    const { modalVisible, modalLoading } = this.state;
+    const { modalVisible, modalLoading, mobileDrawerVisible } = this.state;
     const { token, avatar, name, lastLoginTime, sidebarCollapsed, showSettings, fixedHeader } = this.props;
     const { getFieldDecorator } = this.props.form;
 
@@ -199,21 +237,28 @@ class LayoutHeader extends React.Component {
           style={this.computedStyle()}
           className={fixedHeader ? "fix-header" : ""}
         >
-          <Hamburger />
+          {isSmallScreen() ? (
+            <Icon
+              type="menu"
+              className="mobile-menu-btn"
+              onClick={this.handleOpenMobileDrawer}
+              style={{ fontSize: '24px', marginRight: '16px', cursor: 'pointer' }}
+            />
+          ) : (
+            <Hamburger />
+          )}
           <BreadCrumb />
           <div className="right-menu">
             {/* <FullScreen />
             {showSettings ? <Settings /> : null} */}
             <div className="dropdown-wrap">
               <Dropdown overlay={menu}>
-                <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', alignItems: 'flex-start' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar shape="square" size="medium" src={avatar} style={{ marginRight: '8px' }} />
-                    <span className="username" style={{ marginRight: '8px', fontSize: '14px', fontWeight: '700', color: 'rgba(0,0,0,.85)' }}>{name || '用户'}</span>
-                    <Icon style={{ color: "rgba(0,0,0,.3)" }} type="caret-down" />
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+                  <Avatar shape="square" size="medium" src={avatar} style={{ marginRight: '8px' }} />
+                  <span className="username" style={{ marginRight: '8px', fontSize: '14px', fontWeight: '700', color: 'rgba(0,0,0,.85)' }}>{name || '用户'}</span>
+                  <Icon style={{ color: "rgba(0,0,0,.3)" }} type="caret-down" />
                   {lastLoginTime && (
-                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,.45)', marginTop: '2px' }}>
+                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,.45)', position: 'absolute', bottom: -20, left: 0, whiteSpace: 'nowrap' }}>
                       上次登录: {(() => {
                         const date = new Date(lastLoginTime);
                         // 手动添加8小时（上海时区）
@@ -304,6 +349,10 @@ class LayoutHeader extends React.Component {
             </Modal>
           </div>
         </Header>
+        <MobileDrawer
+          visible={mobileDrawerVisible}
+          onClose={this.handleCloseMobileDrawer}
+        />
       </>
     );
   }

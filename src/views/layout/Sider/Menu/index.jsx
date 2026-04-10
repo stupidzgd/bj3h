@@ -3,21 +3,13 @@ import { Menu, Icon } from "antd";
 import { Link, withRouter } from "react-router-dom";
 import { Scrollbars } from "react-custom-scrollbars";
 import { connect } from "react-redux";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { addTag } from "@/store/actions";
 import { getMenuItemInMenuListByProperty } from "@/utils";
 import menuList from "@/config/menuConfig";
 import "./index.less";
 const SubMenu = Menu.SubMenu;
-// 重新记录数组顺序
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-  return result;
-};
 
-class Meun extends Component {
+class SidebarMenu extends Component {
   state = {
     menuTreeNode: null,
     openKey: [],
@@ -44,17 +36,6 @@ class Meun extends Component {
             </Menu.Item>
           );
         } else {
-          // 查找一个与当前请求路径匹配的子Item
-          const cItem = item.children.find(
-            (cItem) => path.indexOf(cItem.path) === 0
-          );
-          // 如果存在, 说明当前item的子列表需要打开
-          if (cItem) {
-            this.setState((state) => ({
-              openKey: [...state.openKey, item.path],
-            }));
-          }
-
           // 向pre添加<SubMenu>
           pre.push(
             <SubMenu
@@ -76,31 +57,46 @@ class Meun extends Component {
     }, []);
   };
 
-  onDragEnd = (result) => {
-    if (!result.destination) {
-      return;
-    }
-    const _items = reorder(
-      this.state.menuTreeNode,
-      result.source.index,
-      result.destination.index
-    );
-    this.setState({
-      menuTreeNode: _items,
+  // 获取默认打开的菜单
+  getDefaultOpenKeys = (menuList, path) => {
+    const openKeys = [];
+    menuList.forEach(item => {
+      if (item.children) {
+        const cItem = item.children.find(cItem => path.indexOf(cItem.path) === 0);
+        if (cItem) {
+          openKeys.push(item.path);
+          openKeys.push(...this.getDefaultOpenKeys(item.children, path));
+        }
+      }
     });
+    return openKeys;
   };
 
   handleMenuSelect = ({ key = "/dashboard" }) => {
     let menuItem = getMenuItemInMenuListByProperty(menuList, "path", key);
-    this.props.addTag(menuItem);
+    if (menuItem) {
+      this.props.addTag(menuItem);
+    }
   };
 
   componentWillMount() {
+    const path = this.props.location.pathname;
+    const openKey = this.getDefaultOpenKeys(menuList, path);
     const menuTreeNode = this.getMenuNodes(menuList);
     this.setState({
       menuTreeNode,
+      openKey,
     });
-    this.handleMenuSelect(this.state.openKey);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.location.pathname !== this.props.location.pathname) {
+      const path = this.props.location.pathname;
+      const openKey = this.getDefaultOpenKeys(menuList, path);
+      this.setState({
+        openKey,
+      });
+    }
   }
   render() {
     const path = this.props.location.pathname;
@@ -108,43 +104,19 @@ class Meun extends Component {
     return (
       <div className="sidebar-menu-container">
         <Scrollbars autoHide autoHideTimeout={1000} autoHideDuration={200}>
-          <DragDropContext onDragEnd={this.onDragEnd}>
-            <Droppable droppableId="droppable">
-              {(provided, snapshot) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {this.state.menuTreeNode.map((item, index) => (
-                    <Draggable
-                      key={item.key}
-                      draggableId={item.key}
-                      index={index}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <Menu
-                            mode="inline"
-                            theme="dark"
-                            onSelect={this.handleMenuSelect}
-                            selectedKeys={[path]}
-                            defaultOpenKeys={openKey}
-                          >
-                            {item}
-                          </Menu>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <Menu
+            mode="inline"
+            theme="dark"
+            onSelect={this.handleMenuSelect}
+            selectedKeys={[path]}
+            defaultOpenKeys={openKey}
+          >
+            {this.state.menuTreeNode}
+          </Menu>
         </Scrollbars>
       </div>
     );
   }
 }
 
-export default connect((state) => state.user, { addTag })(withRouter(Meun));
+export default connect((state) => state.user, { addTag })(withRouter(SidebarMenu));

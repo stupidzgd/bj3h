@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { setQueryFilters, clearQueryFilters } from "@/store/actions/app";
 import { queryExcelData, getExcelData, deleteExcelData } from "@/api/excel";
 import { debounce } from "@/utils";
+import { isSmallScreen } from "@/utils/device";
 import { CONTENT_CATEGORY_MAP } from "@/config/dictionaries";
 
 const { Option } = Select;
@@ -14,7 +15,8 @@ class ComprehensiveQuery extends Component {
   state = {
     tableData: [],
     tableColumns: [],
-    loading: false
+    loading: false,
+    filterPanelExpanded: false
   };
 
   componentDidMount() {
@@ -239,23 +241,26 @@ class ComprehensiveQuery extends Component {
       return column;
     });
     
-    // 添加操作列
-    tableColumns.push({
-      title: '操作',
-      key: 'action',
-      width: 100,
-      align: 'center',
-      fixed: 'right',
-      render: (text, record) => (
-        <Button 
-          type="danger" 
-          size="small" 
-          onClick={() => this.handleDeleteData(record)}
-        >
-          删除
-        </Button>
-      )
-    });
+    // 非移动端才显示删除按钮
+    if (!isSmallScreen()) {
+      // 添加操作列
+      tableColumns.push({
+        title: '操作',
+        key: 'action',
+        width: 100,
+        align: 'center',
+        fixed: 'right',
+        render: (text, record) => (
+          <Button 
+            type="danger" 
+            size="small" 
+            onClick={() => this.handleDeleteData(record)}
+          >
+            删除
+          </Button>
+        )
+      });
+    }
 
     this.setState({ tableColumns });
   }
@@ -443,6 +448,13 @@ class ComprehensiveQuery extends Component {
     });
   };
 
+  // 切换筛选面板展开/收起状态
+  toggleFilterPanel = () => {
+    this.setState(prevState => ({
+      filterPanelExpanded: !prevState.filterPanelExpanded
+    }));
+  };
+
   // 查询数据
   handleQuery = async () => {
     this.setState({ loading: true });
@@ -535,123 +547,280 @@ class ComprehensiveQuery extends Component {
   };
 
   render() {
-    const { tableData, tableColumns, loading } = this.state;
+    const { tableData, tableColumns, loading, filterPanelExpanded } = this.state;
     const filters = this.props.queryFilters;
+    const isMobile = isSmallScreen();
+    
+    // 添加移动端样式
+    if (isMobile) {
+      // 动态添加移动端样式
+      const style = document.createElement('style');
+      style.textContent = `
+        .mobile-card-head-title .ant-card-head-title {
+          padding: 0 !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
     return (
       <div style={{ padding: '10px 16px' }}>
-        <Card title="综合查询" style={{ marginBottom: 10, padding: '16px 24px' }}>
-          <Row gutter={16} style={{ marginBottom: 12 }}>
-            <Col span={4}>
-              <label style={{ display: 'block', marginBottom: 8 }}>平台</label>
-              <Select
-                mode="multiple"
-                style={{ width: '100%' }}
-                placeholder="选择平台"
-                value={filters.platform}
-                onChange={this.handlePlatformChange}
-              >
-                {this.getPlatformOptions()}
-              </Select>
-            </Col>
-            <Col span={4}>
-              <label style={{ display: 'block', marginBottom: 8 }}>科室</label>
-              <Select
-                mode="multiple"
-                style={{ width: '100%' }}
-                placeholder="选择科室"
-                value={filters.department}
-                onChange={this.handleDepartmentChange}
-              >
-                {this.getDepartmentOptions()}
-              </Select>
-            </Col>
-            <Col span={4}>
-              <label style={{ display: 'block', marginBottom: 8 }}>科室分类</label>
-              <Select
-                mode="multiple"
-                style={{ width: '100%' }}
-                placeholder="选择科室分类"
-                value={filters.departmentCategory}
-                onChange={this.handleDepartmentCategoryChange}
-              >
-                {this.getDepartmentCategoryOptions()}
-              </Select>
-            </Col>
-            <Col span={4}>
-              <label style={{ display: 'block', marginBottom: 8 }}>内容分类</label>
-              <Select
-                mode="multiple"
-                style={{ width: '100%' }}
-                placeholder="选择内容分类"
-                value={filters.contentCategory}
-                onChange={this.handleContentCategoryChange}
-              >
-                {this.getContentCategoryOptions()}
-              </Select>
-            </Col>
-            <Col span={6}>
-              <label style={{ display: 'block', marginBottom: 8 }}>发布时间</label>
-              <RangePicker 
-                style={{ width: '100%' }} 
-                value={filters.dateRange} 
-                onChange={this.handleDateRangeChange} 
-              />
-            </Col>
-          </Row>
-          <Row gutter={16} style={{ marginBottom: 0 }}>
-            <Col span={6}>
-              <label style={{ display: 'block', marginBottom: 8 }}>导入时间</label>
-              <RangePicker 
-                style={{ width: '100%' }} 
-                value={filters.importDateRange} 
-                onChange={this.handleImportDateRangeChange} 
-              />
-            </Col>
-            <Col span={8}>
-              <label style={{ display: 'block', marginBottom: 8 }}>关键词搜索</label>
-              <Search
-                placeholder="搜索标题、作者等"
-                allowClear
-                style={{ width: '100%' }}
-                value={filters.keyword}
-                onChange={(e) => this.handleKeywordSearch(e.target.value)}
-                onSearch={(value) => this.handleKeywordSearch(value)}
-              />
-            </Col>
-            <Col span={10} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
-              <Button 
-                type="danger" 
-                style={{ marginRight: 8 }} 
-                onClick={this.handleBatchDelete}
-                disabled={tableData.length === 0}
-              >
-                批量删除
-              </Button>
-              <Button style={{ marginRight: 8 }} onClick={this.handleResetFilters}>重置</Button>
-              <Button type="primary" onClick={this.handleQuery}>查询</Button>
-            </Col>
-          </Row>
+        <Card 
+          title="综合查询" 
+          style={{ marginBottom: 10, padding: '16px 24px' }} 
+          className={isMobile ? 'mobile-card-head-title' : ''}
+        >
+          {/* 移动端筛选面板 */}
+          {isMobile && (
+            <div style={{ marginBottom: 16 }}>
+              <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Col xs={24}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>平台</label>
+                  <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="选择平台"
+                    value={filters.platform}
+                    onChange={this.handlePlatformChange}
+                  >
+                    {this.getPlatformOptions()}
+                  </Select>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Col xs={24}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>关键词搜索</label>
+                  <Search
+                    placeholder="搜索标题、作者等"
+                    allowClear
+                    style={{ width: '100%' }}
+                    value={filters.keyword}
+                    onChange={(e) => this.handleKeywordSearch(e.target.value)}
+                    onSearch={(value) => this.handleKeywordSearch(value)}
+                  />
+                </Col>
+              </Row>
+              {!filterPanelExpanded && (
+                <Row gutter={16} style={{ marginBottom: 16 }}>
+                  <Col xs={24} style={{ textAlign: 'center' }}>
+                    <Button 
+                      type="primary" 
+                      onClick={this.toggleFilterPanel}
+                      style={{ width: '100%' }}
+                    >
+                      展开更多筛选条件
+                    </Button>
+                  </Col>
+                </Row>
+              )}
+              {filterPanelExpanded && (
+                <div style={{ marginTop: 16 }}>
+                  <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col xs={24}>
+                      <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>科室</label>
+                      <Select
+                        mode="multiple"
+                        style={{ width: '100%' }}
+                        placeholder="选择科室"
+                        value={filters.department}
+                        onChange={this.handleDepartmentChange}
+                      >
+                        {this.getDepartmentOptions()}
+                      </Select>
+                    </Col>
+                  </Row>
+                  <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col xs={24}>
+                      <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>科室分类</label>
+                      <Select
+                        mode="multiple"
+                        style={{ width: '100%' }}
+                        placeholder="选择科室分类"
+                        value={filters.departmentCategory}
+                        onChange={this.handleDepartmentCategoryChange}
+                      >
+                        {this.getDepartmentCategoryOptions()}
+                      </Select>
+                    </Col>
+                  </Row>
+                  <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col xs={24}>
+                      <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>内容分类</label>
+                      <Select
+                        mode="multiple"
+                        style={{ width: '100%' }}
+                        placeholder="选择内容分类"
+                        value={filters.contentCategory}
+                        onChange={this.handleContentCategoryChange}
+                      >
+                        {this.getContentCategoryOptions()}
+                      </Select>
+                    </Col>
+                  </Row>
+                  <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col xs={24}>
+                      <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>发布时间</label>
+                      <RangePicker 
+                        style={{ width: '100%' }} 
+                        value={filters.dateRange} 
+                        onChange={this.handleDateRangeChange} 
+                      />
+                    </Col>
+                  </Row>
+                  <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col xs={24}>
+                      <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>导入时间</label>
+                      <RangePicker 
+                        style={{ width: '100%' }} 
+                        value={filters.importDateRange} 
+                        onChange={this.handleImportDateRangeChange} 
+                      />
+                    </Col>
+                  </Row>
+                  <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col xs={24} style={{ textAlign: 'center' }}>
+                      <Button 
+                        type="primary" 
+                        onClick={this.toggleFilterPanel}
+                        style={{ width: '100%' }}
+                      >
+                        收起筛选条件
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* 桌面端筛选面板 */}
+          {!isMobile && (
+            <>
+              <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>平台</label>
+                  <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="选择平台"
+                    value={filters.platform}
+                    onChange={this.handlePlatformChange}
+                  >
+                    {this.getPlatformOptions()}
+                  </Select>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>科室</label>
+                  <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="选择科室"
+                    value={filters.department}
+                    onChange={this.handleDepartmentChange}
+                  >
+                    {this.getDepartmentOptions()}
+                  </Select>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>科室分类</label>
+                  <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="选择科室分类"
+                    value={filters.departmentCategory}
+                    onChange={this.handleDepartmentCategoryChange}
+                  >
+                    {this.getDepartmentCategoryOptions()}
+                  </Select>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>内容分类</label>
+                  <Select
+                    mode="multiple"
+                    style={{ width: '100%' }}
+                    placeholder="选择内容分类"
+                    value={filters.contentCategory}
+                    onChange={this.handleContentCategoryChange}
+                  >
+                    {this.getContentCategoryOptions()}
+                  </Select>
+                </Col>
+                <Col xs={24} sm={24} md={16} lg={12} xl={6}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>发布时间</label>
+                  <RangePicker 
+                    style={{ width: '100%' }} 
+                    value={filters.dateRange} 
+                    onChange={this.handleDateRangeChange} 
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginBottom: 0 }}>
+                <Col xs={24} sm={24} md={16} lg={12} xl={6}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>导入时间</label>
+                  <RangePicker 
+                    style={{ width: '100%' }} 
+                    value={filters.importDateRange} 
+                    onChange={this.handleImportDateRangeChange} 
+                  />
+                </Col>
+                <Col xs={24} sm={24} md={16} lg={12} xl={8}>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>关键词搜索</label>
+                  <Search
+                    placeholder="搜索标题、作者等"
+                    allowClear
+                    style={{ width: '100%' }}
+                    value={filters.keyword}
+                    onChange={(e) => this.handleKeywordSearch(e.target.value)}
+                    onSearch={(value) => this.handleKeywordSearch(value)}
+                  />
+                </Col>
+                <Col xs={24} sm={24} md={8} lg={12} xl={10} style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                  {!isSmallScreen() && (
+                    <Button 
+                      type="danger" 
+                      style={{ marginRight: 8 }}
+                      onClick={this.handleBatchDelete}
+                      disabled={tableData.length === 0}
+                    >
+                      批量删除
+                    </Button>
+                  )}
+                  <Button style={{ marginRight: 8 }} onClick={this.handleResetFilters}>重置</Button>
+                  <Button type="primary" onClick={this.handleQuery}>查询</Button>
+                </Col>
+              </Row>
+            </>
+          )}
 
         </Card>
 
         <Card>
           <Spin spinning={loading}>
-            <Table
-              bordered
-              columns={tableColumns}
-              dataSource={tableData}
-              scroll={{ x: 5000, y: 'calc(100vh - 450px)' }}
-              pagination={{
-                showSizeChanger: true,
-                pageSizeOptions: ['10', '20', '50', '100'],
-                defaultPageSize: 10,
-                showTotal: (total) => `共 ${total} 条数据`
-              }}
-              rowKey={(record, index) => index}
-              locale={{ emptyText: '暂无查询数据' }}
-              size="small"
-            />
+            <div style={{ 
+              overflowX: isMobile ? 'auto' : 'visible', 
+              WebkitOverflowScrolling: 'touch',
+              maxWidth: '100%'
+            }}>
+              <Table
+                bordered
+                columns={tableColumns}
+                dataSource={tableData}
+                scroll={{ x: 5000, y: 'calc(100vh - 450px)' }}
+                pagination={{
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20', '50', '100'],
+                  defaultPageSize: 10,
+                  showTotal: (total) => `共 ${total} 条数据`
+                }}
+                rowKey={(record, index) => index}
+                locale={{ emptyText: '暂无查询数据' }}
+                size="small"
+                style={{ 
+                  minWidth: isMobile ? '1000px' : 'auto',
+                  width: '100%'
+                }}
+              />
+            </div>
           </Spin>
         </Card>
       </div>

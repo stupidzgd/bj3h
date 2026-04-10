@@ -1,0 +1,90 @@
+// 移动端抽屉样式
+.mobile-drawer {
+  .ant-drawer-content-wrapper {
+    width: 80% !important;
+    max-width: 300px;
+  }
+
+  .ant-drawer-body {
+    padding: 0;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .ant-drawer-header {
+    padding: 16px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+}
+
+// 确保遮罩层正确显示和隐藏
+.ant-drawer-mask {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  opacity: 1 !important;
+  transition: opacity 0.3s ease !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 999 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+
+  &.ant-drawer-mask-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+// 修复移动端抽屉关闭后页面无法滑动的问题
+.ant-drawer-open {
+  overflow: hidden !important;
+}
+
+// 确保抽屉关闭后页面恢复正常
+body:not(.ant-drawer-open) {
+  overflow: auto !important;
+}
+
+// 修复遮罩层残留问题
+.ant-drawer {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1000 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+
+  &.ant-drawer-open {
+    .ant-drawer-mask {
+      display: block !important;
+    }
+  }
+
+  &:not(.ant-drawer-open) {
+    .ant-drawer-mask {
+      display: none !important;
+    }
+  }
+}
+
+// 确保抽屉内容容器正确定位
+.ant-drawer-content-wrapper {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100% !important;
+  z-index: 1001 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}

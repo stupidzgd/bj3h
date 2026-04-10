@@ -31,7 +31,7 @@ const LayoutContent = (props) => {
   };
   return (
     <DocumentTitle title={getPageTitle(menuList, pathname)}>
-      <Content style={{ height: "calc(100% - 100px)" }}>
+      <Content style={{ height: "calc(100% - 100px)", overflow: "auto" }}>
         <TransitionGroup>
           <CSSTransition
             key={location.pathname}

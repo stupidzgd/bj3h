@@ -1,0 +1,179 @@
+// 移动端组件样式
+
+// 按钮适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-btn {
+    .touch-friendly-button();
+  }
+  
+  .ant-btn-group > .ant-btn {
+    .touch-friendly-button();
+  }
+}
+
+// 输入框适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-input {
+    height: @mobile-input-height;
+    font-size: @mobile-font-size;
+  }
+  
+  .ant-input-affix-wrapper {
+    height: @mobile-input-height;
+  }
+  
+  .ant-select {
+    .ant-select-selection {
+      height: @mobile-input-height;
+      line-height: @mobile-input-height;
+    }
+  }
+  
+  .ant-cascader-picker {
+    height: @mobile-input-height;
+  }
+  
+  .ant-picker {
+    height: @mobile-input-height;
+  }
+}
+
+// 表格适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-table {
+    .horizontal-scroll();
+    
+    .ant-table-thead > tr > th,
+    .ant-table-tbody > tr > td {
+      padding: @mobile-padding-xs @mobile-padding-sm;
+      font-size: @mobile-font-size;
+    }
+    
+    .ant-table-row {
+      height: @mobile-table-row-height;
+    }
+  }
+}
+
+// 表单适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-form-item {
+    margin-bottom: @mobile-padding-md;
+    
+    .ant-form-item-label {
+      padding-bottom: @mobile-padding-xs;
+    }
+  }
+}
+
+// 卡片适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-card {
+    margin-bottom: @mobile-padding-md;
+    
+    .ant-card-body {
+      padding: @mobile-padding-md;
+    }
+  }
+}
+
+// 模态框适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-modal {
+    width: 90% !important;
+    max-width: 90% !important;
+    
+    .ant-modal-body {
+      padding: @mobile-padding-md;
+    }
+  }
+}
+
+// 抽屉适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-drawer {
+    width: 80% !important;
+    max-width: 80% !important;
+  }
+}
+
+// 菜单适配
+@media (max-width: @mobile-breakpoint) {
+  .ant-menu {
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      font-size: @mobile-font-size;
+      padding: 0 @mobile-padding-md;
+      height: 40px;
+      line-height: 40px;
+    }
+  }
+  
+  // 数据分析概览适配
+  .data-analysis-overview {
+    h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    
+    .ant-select {
+      width: 100% !important;
+      margin-bottom: @mobile-padding-sm;
+    }
+    
+    .ant-picker {
+      width: 100% !important;
+    }
+  }
+  
+  // 日期选择器适配
+  .ant-picker {
+    width: 100% !important;
+    height: @mobile-input-height !important;
+    font-size: @mobile-font-size !important;
+  }
+  
+  .ant-picker-range {
+    width: 100% !important;
+    
+    .ant-picker-input {
+      font-size: @mobile-font-size !important;
+    }
+  }
+  
+  // 日期选择器弹出层适配
+  .ant-picker-dropdown {
+    z-index: 9999 !important;
+    
+    .ant-picker-header {
+      padding: @mobile-padding-sm;
+      
+      .ant-picker-header-view {
+        font-size: @mobile-font-size;
+      }
+    }
+    
+    .ant-picker-body {
+      padding: @mobile-padding-sm;
+      
+      .ant-picker-cell {
+        font-size: @mobile-font-size;
+        height: 36px;
+        line-height: 36px;
+      }
+      
+      .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+        background-color: @mobile-primary-color;
+      }
+    }
+  }
+  
+  // 内容区域滚动适配
+  .ant-layout-content {
+    .vertical-scroll();
+    
+    .app-container {
+      padding: @mobile-padding-md;
+    }
+  }
+}

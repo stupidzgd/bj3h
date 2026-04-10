@@ -6,7 +6,7 @@ export default function app(state = initState, action) {
   switch (action.type) {
     case types.TAGSVIEW_ADD_TAG:
       const tag = action.tag;
-      if (state.taglist.includes(tag)) {
+      if (state.taglist.some(item => item.path === tag.path)) {
         return state;
       } else {
         return {

@@ -1,0 +1,34 @@
+@import './_variables.less';
+@import './_mixins.less';
+@import './_components.less';
+
+// 移动端媒体查询
+@media (max-width: @mobile-breakpoint) {
+  // 全局样式重置
+  body {
+    font-size: @mobile-font-size;
+  }
+  
+  // 布局适配
+  .ant-layout {
+    min-height: 100vh;
+  }
+  
+  // 移动端特有样式
+  .mobile-only {
+    display: block;
+  }
+  
+  // 隐藏PC端元素
+  .pc-only {
+    display: none;
+  }
+}
+
+// 平板媒体查询
+@media (min-width: @mobile-breakpoint + 1) and (max-width: @tablet-breakpoint) {
+  // 平板适配样式
+  body {
+    font-size: @tablet-font-size;
+  }
+}

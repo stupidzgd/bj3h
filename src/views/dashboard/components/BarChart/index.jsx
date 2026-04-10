@@ -3,6 +3,7 @@ import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import echarts from "@/lib/echarts";
 import { debounce } from "@/utils";
+import { isSmallScreen } from "@/utils/device";
 import NoData from "@/components/NoData";
 
 class BarChart extends Component {
@@ -63,6 +64,7 @@ class BarChart extends Component {
 
   setOptions(chartData) {
     const animationDuration = 3000;
+    const isMobile = isSmallScreen();
     const data = chartData || [
       { name: "Mon", value: 79 },
       { name: "Tue", value: 52 },
@@ -80,12 +82,15 @@ class BarChart extends Component {
           // 坐标轴指示器，坐标轴触发有效
           type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
         },
+        textStyle: {
+          fontSize: isMobile ? 12 : 14,
+        },
       },
       grid: {
-        top: 10,
-        left: "2%",
-        right: "2%",
-        bottom: "3%",
+        top: isMobile ? 10 : 10,
+        left: isMobile ? "3%" : "2%",
+        right: isMobile ? "3%" : "2%",
+        bottom: isMobile ? "10%" : "3%",
         containLabel: true,
       },
       xAxis: [
@@ -95,6 +100,10 @@ class BarChart extends Component {
           axisTick: {
             alignWithLabel: true,
           },
+          axisLabel: {
+            fontSize: isMobile ? 10 : 12,
+            rotate: isMobile ? 45 : 0,
+          },
         },
       ],
       yAxis: [
@@ -103,6 +112,9 @@ class BarChart extends Component {
           axisTick: {
             show: false,
           },
+          axisLabel: {
+            fontSize: isMobile ? 10 : 12,
+          },
         },
       ],
       series: [
@@ -110,11 +122,23 @@ class BarChart extends Component {
           name: "数据量",
           type: "bar",
           stack: "vistors",
-          barWidth: "60%",
+          barWidth: isMobile ? "50%" : "60%",
           data: data.map(item => item.value),
           animationDuration,
         },
       ],
+      // 移动端手势操作
+      dataZoom: isMobile ? [
+        {
+          type: 'inside',
+          start: 0,
+          end: 100,
+        },
+        {
+          start: 0,
+          end: 100,
+        },
+      ] : [],
     });
   }
 

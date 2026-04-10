@@ -3,6 +3,7 @@
   z-index: 9;
   position: relative;
   height: 64px;
+  padding: 0 50px;
   background: #fff !important;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
   .right-menu {
@@ -25,6 +26,14 @@
     }
   }
 }
+
+// 移动端样式
+@media screen and (max-width: 768px) {
+  .ant-layout-header {
+    padding: 0 24px !important;
+  }
+}
+
 .fix-header {
   position: fixed;
   top: 0;

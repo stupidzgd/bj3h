@@ -18,3 +18,95 @@
     margin-bottom: 32px;
   }
 }
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  .data-analysis-overview {
+    padding: 12px !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .data-analysis-overview h2 {
+    font-size: 16px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .data-analysis-overview > div {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .ant-select {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  
+  .ant-picker {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  
+  /* 确保日期选择器弹窗在移动端正确显示 */
+  .ant-picker-dropdown {
+    width: 90% !important;
+    max-width: 300px !important;
+    left: 5% !important;
+    right: 5% !important;
+    margin: 0 !important;
+    transform: none !important;
+    position: fixed !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 1050 !important;
+  }
+  
+  /* 调整日期选择器弹窗内部样式 */
+  .ant-picker-dropdown .ant-picker-panel {
+    width: 100% !important;
+  }
+  
+  .ant-picker-dropdown .ant-picker-date-panel {
+    width: 100% !important;
+  }
+  
+  .ant-picker-dropdown .ant-picker-header {
+    padding: 8px 12px !important;
+  }
+  
+  .ant-picker-dropdown .ant-picker-body {
+    padding: 8px !important;
+  }
+  
+  .ant-picker-dropdown .ant-picker-cell {
+    padding: 4px !important;
+  }
+  
+  .ant-picker-dropdown .ant-picker-cell-inner {
+    font-size: 14px !important;
+    width: 32px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+  }
+  
+  /* 调整卡片间距 */
+  .ant-row {
+    margin-bottom: 20px !important;
+  }
+  
+  .ant-col {
+    margin-bottom: 16px !important;
+  }
+  
+  /* 调整统计卡片大小 */
+  .ant-card {
+    margin-bottom: 12px !important;
+  }
+  
+  .ant-statistic-title {
+    font-size: 14px !important;
+  }
+  
+  .ant-statistic-content-value {
+    font-size: 20px !important;
+  }
+}
