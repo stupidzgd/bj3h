@@ -152,7 +152,7 @@ class DataList extends Component {
             bordered
             columns={tableColumns}
             dataSource={tableData}
-            scroll={{ x: 3000, y: 'calc(100vh - 300px)' }}
+            scroll={{ x: 3000, y: false }}
             pagination={{ 
               pageSize: 10, 
               showSizeChanger: true,

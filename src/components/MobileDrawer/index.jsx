@@ -137,9 +137,11 @@ class MobileDrawer extends React.Component {
         style={{ position: 'absolute' }}
         afterVisibleChange={this.handleAfterVisibleChange}
         zIndex={1000}
+        closable={false}
       >
         <Menu
           mode="inline"
+          theme="dark"
           openKeys={openKeys}
           selectedKeys={selectedKeys}
           onOpenChange={this.handleOpenChange}

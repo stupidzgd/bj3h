@@ -1,8 +1,8 @@
 // 移动端抽屉样式
 .mobile-drawer {
   .ant-drawer-content-wrapper {
-    width: 80% !important;
-    max-width: 300px;
+    width: 70% !important;
+    max-width: 260px;
   }
 
   .ant-drawer-body {
@@ -12,10 +12,24 @@
   }
 
   .ant-drawer-header {
-    padding: 16px;
-    border-bottom: 1px solid #e8e8e8;
+    padding: 0 !important;
+    border-bottom: 1px solid #404657 !important;
     height: 64px;
     box-sizing: border-box;
+    background: #2b2f3a !important;
+  }
+  
+  .ant-drawer-body {
+    height: calc(100% - 64px);
+  }
+
+  .ant-drawer-title {
+    margin: 0 !important;
+    color: #fff !important;
+  }
+
+  .ant-drawer-close {
+    color: #fff !important;
   }
 }
 
@@ -87,39 +101,39 @@ body:not(.ant-drawer-open) {
   height: 100% !important;
   z-index: 1001 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-  background: #2b2f3a !important;
   overflow: hidden !important;
 }
 
 // 移动端菜单样式
 .mobile-drawer {
   .ant-drawer-header {
-    background: #2b2f3a !important;
     border-bottom: 1px solid #404657 !important;
+    padding: 0 !important;
   }
   
-  .ant-menu {
-    background: #2b2f3a !important;
+  .sidebar-logo-container {
+    text-align: left !important;
+    padding: 0 16px !important;
   }
   
-  .ant-menu-item {
-    color: #fff !important;
+  .sidebar-title {
+    margin-left: 8px !important;
   }
   
-  .ant-menu-item-selected {
-    background-color: #1890ff !important;
-    color: #fff !important;
+  // 调整二级菜单对齐，与一级菜单保持一致
+  .ant-menu-inline .ant-menu-item,
+  .ant-menu-inline .ant-menu-submenu-title {
+    margin: 0 !important;
+    padding: 0 24px !important;
   }
   
-  .ant-menu-submenu-title {
-    color: #fff !important;
+  // 二级菜单不缩进
+  .ant-menu-inline .ant-menu-item-group > .ant-menu-item,
+  .ant-menu-inline .ant-menu-item-group > .ant-menu-submenu > .ant-menu-submenu-title {
+    padding: 0 24px !important;
   }
   
-  .ant-menu-submenu-selected {
-    color: #fff !important;
-  }
-  
-  .anticon {
-    color: #fff !important;
+  .ant-menu-inline .ant-menu-submenu > .ant-menu {
+    padding-left: 0 !important;
   }
 }

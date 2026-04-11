@@ -229,9 +229,6 @@ class ImportExcel extends Component {
         // if (index < 3) {
         //   column.fixed = true;
         // }
-                if (index < 3) {
-          column.fixed = index === 0 ? 'left' : (index === 1 ? 'left' : 'left');
-        }
         // 特殊列处理
         if (item === '链接') {
           column.width = 80;
@@ -507,7 +504,12 @@ class ImportExcel extends Component {
         </Spin>
         
         {importCount > 0 && (
-          <div style={{ marginTop: 24 }}>
+          <div style={{ 
+            marginTop: 24,
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            maxWidth: '100%'
+          }}>
             <Table
               bordered
               columns={tableColumns.map(col => ({
@@ -516,7 +518,7 @@ class ImportExcel extends Component {
                 fixed: col.fixed || false
               }))}
               dataSource={tableData}
-              scroll={{ x: 6000, y: 'calc(100vh - 400px)' }}
+              scroll={{ x: 6000, y: false }}
               pagination={{
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50', '100'],
