@@ -591,7 +591,7 @@ class ComprehensiveQuery extends Component {
           {isMobile && (
             <div style={{ marginBottom: 16 }} className="mobile-form-item">
               <Form layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Row gutter={16} style={{ marginBottom: 8 }}>
                   <Col xs={24}>
                     <Form.Item label="平台" style={{ marginBottom: 0 }}>
                       <Select
@@ -606,7 +606,7 @@ class ComprehensiveQuery extends Component {
                     </Form.Item>
                   </Col>
                 </Row>
-                <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Row gutter={16} style={{ marginBottom: 8 }}>
                   <Col xs={24}>
                     <Form.Item label="关键词搜索" style={{ marginBottom: 0 }}>
                       <Search
@@ -637,7 +637,7 @@ class ComprehensiveQuery extends Component {
               {filterPanelExpanded && (
                 <div style={{ marginTop: 16 }} className="mobile-form-item">
                   <Form layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                    <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Row gutter={16} style={{ marginBottom: 8 }}>
                       <Col xs={24}>
                         <Form.Item label="科室" style={{ marginBottom: 0 }}>
                           <Select
@@ -652,7 +652,7 @@ class ComprehensiveQuery extends Component {
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Row gutter={16} style={{ marginBottom: 8 }}>
                       <Col xs={24}>
                         <Form.Item label="科室分类" style={{ marginBottom: 0 }}>
                           <Select
@@ -667,7 +667,7 @@ class ComprehensiveQuery extends Component {
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Row gutter={16} style={{ marginBottom: 8 }}>
                       <Col xs={24}>
                         <Form.Item label="内容分类" style={{ marginBottom: 0 }}>
                           <Select
@@ -682,7 +682,7 @@ class ComprehensiveQuery extends Component {
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Row gutter={16} style={{ marginBottom: 8 }}>
                       <Col xs={24}>
                         <Form.Item label="发布时间" style={{ marginBottom: 0 }}>
                           <RangePicker 
@@ -693,7 +693,7 @@ class ComprehensiveQuery extends Component {
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Row gutter={16} style={{ marginBottom: 8 }}>
                       <Col xs={24}>
                         <Form.Item label="导入时间" style={{ marginBottom: 0 }}>
                           <RangePicker 
