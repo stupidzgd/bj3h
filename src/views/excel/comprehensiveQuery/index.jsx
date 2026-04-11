@@ -570,6 +570,12 @@ class ComprehensiveQuery extends Component {
           height: 32px;
           line-height: 32px;
         }
+        .mobile-form-item .ant-row {
+          margin-bottom: 8px !important;
+        }
+        .mobile-form-item .ant-form-item {
+          margin-bottom: 0 !important;
+        }
       `;
       document.head.appendChild(style);
     }

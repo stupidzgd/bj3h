@@ -75,6 +75,9 @@ const Main = (props) => {
                 // 兼容性处理
                 setTimeout(() => {
                   contentElement.scrollTop = 0;
+                  // 手动触发滚动事件，确保回到顶部按钮隐藏
+                  const event = new Event('scroll');
+                  contentElement.dispatchEvent(event);
                 }, 100);
               }
               
@@ -87,6 +90,11 @@ const Main = (props) => {
               setTimeout(() => {
                 document.documentElement.scrollTop = 0;
                 document.body.scrollTop = 0;
+                // 手动触发window滚动事件，确保回到顶部按钮隐藏
+                const event = new Event('scroll');
+                window.dispatchEvent(event);
+                // 直接设置showBackToTop为false，确保按钮隐藏
+                setShowBackToTop(false);
               }, 100);
             }}
             style={{
