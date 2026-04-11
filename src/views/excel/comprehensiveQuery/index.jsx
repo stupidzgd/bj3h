@@ -543,15 +543,16 @@ class ComprehensiveQuery extends Component {
     }
   };
 
-  render() {
-    const { tableData, tableColumns, loading, filterPanelExpanded } = this.state;
-    const filters = this.props.queryFilters;
-    const isMobile = isSmallScreen();
+  componentDidMount() {
+    // 从后端获取数据
+    this.fetchData();
     
-    // 添加移动端样式
+    // 检查是否为移动端，添加移动端样式
+    const isMobile = isSmallScreen();
     if (isMobile) {
       // 动态添加移动端样式
       const style = document.createElement('style');
+      style.id = 'mobile-comprehensive-query-styles';
       style.textContent = `
         .mobile-card-head-title .ant-card-head-title {
           padding: 0 !important;
@@ -576,9 +577,34 @@ class ComprehensiveQuery extends Component {
         .mobile-form-item .ant-form-item {
           margin-bottom: 0 !important;
         }
+        /* 确保覆盖内联样式 */
+        .mobile-form-item .ant-row {
+          margin-bottom: 8px !important;
+        }
+        .mobile-form-item .ant-row[style] {
+          margin-bottom: 8px !important;
+        }
+        .mobile-form-item .ant-row {
+          margin-bottom: 8px !important;
+        }
       `;
+      
+      // 先移除已存在的样式，避免重复
+      const existingStyle = document.getElementById('mobile-comprehensive-query-styles');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+      
       document.head.appendChild(style);
     }
+  }
+
+  render() {
+    const { tableData, tableColumns, loading, filterPanelExpanded } = this.state;
+    const filters = this.props.queryFilters;
+    const isMobile = isSmallScreen();
+    
+    // 不再在render中添加样式，改为在componentDidMount中添加
 
     return (
       <div style={{ padding: '10px 16px' }}>
@@ -589,41 +615,37 @@ class ComprehensiveQuery extends Component {
         >
           {/* 移动端筛选面板 */}
           {isMobile && (
-            <div style={{ marginBottom: 16 }} className="mobile-form-item">
-              <Form layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                <Row gutter={16} style={{ marginBottom: 8 }}>
-                  <Col xs={24}>
-                    <Form.Item label="平台" style={{ marginBottom: 0 }}>
-                      <Select
-                        mode="multiple"
-                        style={{ width: '100%' }}
-                        placeholder="选择平台"
-                        value={filters.platform}
-                        onChange={this.handlePlatformChange}
-                      >
-                        {this.getPlatformOptions()}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row gutter={16} style={{ marginBottom: 8 }}>
-                  <Col xs={24}>
-                    <Form.Item label="关键词搜索" style={{ marginBottom: 0 }}>
-                      <Search
-                        placeholder="搜索标题、作者等"
-                        allowClear
-                        style={{ width: '100%' }}
-                        value={filters.keyword}
-                        onChange={(e) => this.handleKeywordSearch(e.target.value)}
-                        onSearch={(value) => this.handleKeywordSearch(value)}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
+            <div style={{ marginBottom: 8, padding: 0 }} className="mobile-form-item">
+              <Form layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} style={{ margin: 0 }}>
+                <div style={{ marginBottom: 4 }}>
+                  <Form.Item label="平台" style={{ marginBottom: 0 }}>
+                    <Select
+                      mode="multiple"
+                      style={{ width: '100%' }}
+                      placeholder="选择平台"
+                      value={filters.platform}
+                      onChange={this.handlePlatformChange}
+                    >
+                      {this.getPlatformOptions()}
+                    </Select>
+                  </Form.Item>
+                </div>
+                <div style={{ marginBottom: 4 }}>
+                  <Form.Item label="关键词搜索" style={{ marginBottom: 0 }}>
+                    <Search
+                      placeholder="搜索标题、作者等"
+                      allowClear
+                      style={{ width: '100%' }}
+                      value={filters.keyword}
+                      onChange={(e) => this.handleKeywordSearch(e.target.value)}
+                      onSearch={(value) => this.handleKeywordSearch(value)}
+                    />
+                  </Form.Item>
+                </div>
               </Form>
               {!filterPanelExpanded && (
-                <Row gutter={16} style={{ marginBottom: 16 }}>
-                  <Col xs={24} style={{ textAlign: 'center' }}>
+                <div style={{ marginBottom: 8, marginTop: 4 }}>
+                  <div style={{ textAlign: 'center' }}>
                     <Button 
                       type="primary" 
                       onClick={this.toggleFilterPanel}
@@ -631,82 +653,72 @@ class ComprehensiveQuery extends Component {
                     >
                       展开更多筛选条件
                     </Button>
-                  </Col>
-                </Row>
+                  </div>
+                </div>
               )}
               {filterPanelExpanded && (
-                <div style={{ marginTop: 16 }} className="mobile-form-item">
-                  <Form layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-                    <Row gutter={16} style={{ marginBottom: 8 }}>
-                      <Col xs={24}>
-                        <Form.Item label="科室" style={{ marginBottom: 0 }}>
-                          <Select
-                            mode="multiple"
-                            style={{ width: '100%' }}
-                            placeholder="选择科室"
-                            value={filters.department}
-                            onChange={this.handleDepartmentChange}
-                          >
-                            {this.getDepartmentOptions()}
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} style={{ marginBottom: 8 }}>
-                      <Col xs={24}>
-                        <Form.Item label="科室分类" style={{ marginBottom: 0 }}>
-                          <Select
-                            mode="multiple"
-                            style={{ width: '100%' }}
-                            placeholder="选择科室分类"
-                            value={filters.departmentCategory}
-                            onChange={this.handleDepartmentCategoryChange}
-                          >
-                            {this.getDepartmentCategoryOptions()}
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} style={{ marginBottom: 8 }}>
-                      <Col xs={24}>
-                        <Form.Item label="内容分类" style={{ marginBottom: 0 }}>
-                          <Select
-                            mode="multiple"
-                            style={{ width: '100%' }}
-                            placeholder="选择内容分类"
-                            value={filters.contentCategory}
-                            onChange={this.handleContentCategoryChange}
-                          >
-                            {this.getContentCategoryOptions()}
-                          </Select>
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} style={{ marginBottom: 8 }}>
-                      <Col xs={24}>
-                        <Form.Item label="发布时间" style={{ marginBottom: 0 }}>
-                          <RangePicker 
-                            style={{ width: '100%' }} 
-                            value={filters.dateRange} 
-                            onChange={this.handleDateRangeChange} 
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} style={{ marginBottom: 8 }}>
-                      <Col xs={24}>
-                        <Form.Item label="导入时间" style={{ marginBottom: 0 }}>
-                          <RangePicker 
-                            style={{ width: '100%' }} 
-                            value={filters.importDateRange} 
-                            onChange={this.handleImportDateRangeChange} 
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
+                <div style={{ marginTop: 8, padding: 0 }} className="mobile-form-item">
+                  <Form layout="horizontal" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} style={{ margin: 0 }}>
+                    <div style={{ marginBottom: 4 }}>
+                      <Form.Item label="科室" style={{ marginBottom: 0 }}>
+                        <Select
+                          mode="multiple"
+                          style={{ width: '100%' }}
+                          placeholder="选择科室"
+                          value={filters.department}
+                          onChange={this.handleDepartmentChange}
+                        >
+                          {this.getDepartmentOptions()}
+                        </Select>
+                      </Form.Item>
+                    </div>
+                    <div style={{ marginBottom: 4 }}>
+                      <Form.Item label="科室分类" style={{ marginBottom: 0 }}>
+                        <Select
+                          mode="multiple"
+                          style={{ width: '100%' }}
+                          placeholder="选择科室分类"
+                          value={filters.departmentCategory}
+                          onChange={this.handleDepartmentCategoryChange}
+                        >
+                          {this.getDepartmentCategoryOptions()}
+                        </Select>
+                      </Form.Item>
+                    </div>
+                    <div style={{ marginBottom: 4 }}>
+                      <Form.Item label="内容分类" style={{ marginBottom: 0 }}>
+                        <Select
+                          mode="multiple"
+                          style={{ width: '100%' }}
+                          placeholder="选择内容分类"
+                          value={filters.contentCategory}
+                          onChange={this.handleContentCategoryChange}
+                        >
+                          {this.getContentCategoryOptions()}
+                        </Select>
+                      </Form.Item>
+                    </div>
+                    <div style={{ marginBottom: 4 }}>
+                      <Form.Item label="发布时间" style={{ marginBottom: 0 }}>
+                        <RangePicker 
+                          style={{ width: '100%' }} 
+                          value={filters.dateRange} 
+                          onChange={this.handleDateRangeChange} 
+                        />
+                      </Form.Item>
+                    </div>
+                    <div style={{ marginBottom: 4 }}>
+                      <Form.Item label="导入时间" style={{ marginBottom: 0 }}>
+                        <RangePicker 
+                          style={{ width: '100%' }} 
+                          value={filters.importDateRange} 
+                          onChange={this.handleImportDateRangeChange} 
+                        />
+                      </Form.Item>
+                    </div>
                   </Form>
-                  <Row gutter={16} style={{ marginBottom: 16 }}>
-                    <Col xs={24} style={{ textAlign: 'center' }}>
+                  <div style={{ marginBottom: 8, marginTop: 4 }}>
+                    <div style={{ textAlign: 'center' }}>
                       <Button 
                         type="primary" 
                         onClick={this.toggleFilterPanel}
@@ -714,31 +726,33 @@ class ComprehensiveQuery extends Component {
                       >
                         收起筛选条件
                       </Button>
-                    </Col>
-                  </Row>
+                    </div>
+                  </div>
                 </div>
               )}
               
               {/* 移动端按钮组 */}
-              <Row gutter={16} style={{ marginBottom: 16 }}>
-                <Col xs={12}>
-                  <Button 
-                    style={{ width: '100%' }}
-                    onClick={this.handleResetFilters}
-                  >
-                    重置
-                  </Button>
-                </Col>
-                <Col xs={12}>
-                  <Button 
-                    type="primary" 
-                    style={{ width: '100%' }}
-                    onClick={this.handleQuery}
-                  >
-                    查询
-                  </Button>
-                </Col>
-              </Row>
+              <div style={{ marginBottom: 8, marginTop: 4 }}>
+                <div style={{ display: 'flex', gap: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <Button 
+                      style={{ width: '100%' }}
+                      onClick={this.handleResetFilters}
+                    >
+                      重置
+                    </Button>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Button 
+                      type="primary" 
+                      style={{ width: '100%' }}
+                      onClick={this.handleQuery}
+                    >
+                      查询
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           
