@@ -878,34 +878,48 @@ class ComprehensiveQuery extends Component {
 
         <Card>
           <Spin spinning={loading}>
-            <div style={{ 
-              overflowX: 'auto', 
-              WebkitOverflowScrolling: 'touch',
-              maxWidth: '100%'
-            }}>
-              <Table
-                bordered
-                columns={tableColumns}
-                dataSource={tableData}
-                scroll={{ 
-                  x: 5000, 
-                  y: false
-                }}
-                pagination={{
-                  showSizeChanger: true,
-                  pageSizeOptions: ['10', '20', '50', '100'],
-                  defaultPageSize: 10,
-                  showTotal: (total) => `共 ${total} 条数据`
-                }}
-                rowKey={(record, index) => index}
-                locale={{ emptyText: '暂无查询数据' }}
-                size="small"
-                style={{ 
-                  minWidth: isMobile ? '1000px' : 'auto',
-                  width: '100%'
-                }}
-              />
-            </div>
+            {tableData.length > 0 ? (
+              <div style={{ 
+                overflowX: 'auto', 
+                WebkitOverflowScrolling: 'touch',
+                maxWidth: '100%'
+              }}>
+                <Table
+                  bordered
+                  columns={tableColumns}
+                  dataSource={tableData}
+                  scroll={{ 
+                    x: 5000, 
+                    y: false
+                  }}
+                  pagination={{
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50', '100'],
+                    defaultPageSize: 10,
+                    showTotal: (total) => `共 ${total} 条数据`
+                  }}
+                  rowKey={(record, index) => index}
+                  size="small"
+                  style={{ 
+                    width: '100%'
+                  }}
+                />
+              </div>
+            ) : (
+              <div style={{
+                textAlign: 'center',
+                padding: '40px 0',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <div style={{ fontSize: '36px', color: '#f0f0f0', marginBottom: '12px' }}>📊</div>
+                <div style={{ fontSize: '14px', color: '#999', marginBottom: '6px' }}>暂无查询数据</div>
+                <div style={{ fontSize: '12px', color: '#ccc' }}>请尝试调整筛选条件或导入数据后再查看</div>
+              </div>
+            )}
           </Spin>
         </Card>
       </div>

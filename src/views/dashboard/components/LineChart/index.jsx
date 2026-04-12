@@ -162,10 +162,10 @@ class LineChart extends Component {
       <div
         className={className}
         style={{
-          ...styles,
           height,
           width,
-          position: 'relative'
+          position: 'relative',
+          ...styles
         }}
       >
         {hasData ? (
