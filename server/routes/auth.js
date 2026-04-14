@@ -5,26 +5,44 @@ const User = require('../models/User');
 // 登录接口
 router.post('/login', async (req, res) => {
   try {
+    console.log('登录请求:', req.body);
     const { username, password } = req.body;
     
     // 查找用户
+    console.log('查找用户:', username);
     const user = await User.findOne({ where: { username } });
+    console.log('找到用户:', user);
     
     if (!user) {
       return res.status(200).json({ status: 1, message: '用户名或密码错误' });
     }
     
-    // 验证密码
-    if (user.password !== password) {
-      return res.status(200).json({ status: 1, message: '用户名或密码错误' });
+    // 检查用户状态
+    if (user.status === 0) {
+      return res.status(200).json({ status: 1, message: '账号已被禁用' });
     }
     
-    // 更新最后登录时间，使用当前时间（本地时区）
-    await user.update({ lastLoginTime: new Date() });
+    // 验证密码
+    console.log('验证密码');
+    try {
+      const isPasswordValid = await User.verifyPassword(password, user.password, user);
+      console.log('密码验证结果:', isPasswordValid);
+      if (!isPasswordValid) {
+        return res.status(200).json({ status: 1, message: '用户名或密码错误' });
+      }
+    } catch (error) {
+      console.error('密码验证错误:', error);
+      return res.status(200).json({ status: 1, message: '用户名或密码错误' });
+    }
     
     // 生成 token，包含用户名和过期时间（12小时后）
     const expireTime = Date.now() + 12 * 60 * 60 * 1000; // 12小时过期
     const token = `${username}-${expireTime}-token`;
+    console.log('生成token:', token);
+    
+    // 更新最后登录时间
+    await user.update({ lastLoginTime: new Date() });
+    console.log('更新最后登录时间');
     
     return res.status(200).json({ status: 0, token });
   } catch (error) {
@@ -101,7 +119,7 @@ router.post('/updateProfile', async (req, res) => {
   try {
     console.log('修改个人信息请求:', req.body);
     
-    const { username, name, password, description, token } = req.body;
+    const { username, name, password, oldPassword, newPassword, description, token } = req.body;
     
     if (!username) {
       return res.status(200).json({ status: 1, message: '账号不能为空' });
@@ -142,12 +160,32 @@ router.post('/updateProfile', async (req, res) => {
       return res.status(200).json({ status: 1, message: '用户不存在' });
     }
     
-    // 更新用户信息
-    await user.update({
+    // 如果提供了旧密码，验证旧密码是否正确
+    if (oldPassword) {
+      const isPasswordValid = await User.verifyPassword(oldPassword, user.password, user);
+      if (!isPasswordValid) {
+        return res.status(200).json({ status: 1, message: '旧密码错误' });
+      }
+    }
+    
+    // 准备更新数据
+    const updateData = {
       name,
-      password,
       description
-    });
+    };
+    
+    // 如果提供了新密码，加密并更新
+    if (newPassword) {
+      const hashedPassword = await User.hashPassword(newPassword);
+      updateData.password = hashedPassword;
+    } else if (password) {
+      // 兼容旧的密码字段
+      const hashedPassword = await User.hashPassword(password);
+      updateData.password = hashedPassword;
+    }
+    
+    // 更新用户信息
+    await user.update(updateData);
     
     console.log('个人信息修改成功');
     return res.status(200).json({ status: 0, message: '个人信息修改成功' });

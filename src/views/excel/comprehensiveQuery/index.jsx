@@ -30,7 +30,7 @@ class ComprehensiveQuery extends Component {
     try {
       // 调用后端API获取所有数据
       const response = await getExcelData();
-      const data = response.data.data;
+      const data = response.data || []; // 如果 data 为 null 或 undefined，使用空数组
       
       // 内容分类映射（使用统一配置）
       const contentCategoryMap = CONTENT_CATEGORY_MAP;
@@ -474,7 +474,7 @@ class ComprehensiveQuery extends Component {
       
       // 调用后端API获取数据
       const response = await queryExcelData(params);
-      let filteredData = response.data;
+      let filteredData = response.data || []; // 如果 data 为 null 或 undefined，使用空数组
       
       // 内容分类映射（使用统一配置）
       const contentCategoryMap = CONTENT_CATEGORY_MAP;

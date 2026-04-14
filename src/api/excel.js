@@ -12,7 +12,7 @@ export function importExcel(data) {
 
 export function getExcelData() {
   return request({
-    url: '/api/excel/all',
+    url: '/api/excel/query',
     method: 'get'
   })
 }
@@ -50,7 +50,7 @@ export function clearExcelData() {
 
 export function getAnalysisData(params) {
   return request({
-    url: '/api/excel/all',
+    url: '/api/excel/query',
     method: 'get',
     params
   })

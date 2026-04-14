@@ -50,9 +50,9 @@ const Dashboard = () => {
         params.endDate = moment(dateRange[1]).format('YYYY-MM-DD');
       }
       const response = await getAnalysisData(params);
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        processData(response.data.data);
-        setLastUpdateTime(response.data.lastUpdateTime || null);
+      if (response.data && response.data.length > 0) {
+        processData(response.data);
+        setLastUpdateTime(response.lastUpdateTime || null);
       } else {
         // 当没有数据时，重置所有状态
         setStats({

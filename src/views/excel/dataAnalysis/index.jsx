@@ -56,11 +56,11 @@ class DataAnalysis extends Component {
       };
       
       const response = await getAnalysisData(params);
-      console.log('从后端获取的数据长度:', response.data.data.length);
-      console.log('从后端获取的数据前5条:', response.data.data.slice(0, 5));
+      console.log('从后端获取的数据长度:', response.data.length);
+      console.log('从后端获取的数据前5条:', response.data.slice(0, 5));
       
       // 转换数据格式，适配前端需要的格式
-      const formattedData = response.data.data.map(item => {
+      const formattedData = response.data.map(item => {
         // 转换字段名，从 snake_case 转换为 中文
         const formattedItem = {
           '平台': item.platform || '',

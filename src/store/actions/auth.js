@@ -4,8 +4,7 @@ import { setToken, removeToken } from "@/utils/auth";
 export const login = (username, password) => (dispatch) => {
   return new Promise((resolve, reject) => {
     reqLogin({ username: username.trim(), password: password })
-      .then((response) => {
-        const { data } = response;
+      .then((data) => {
         if (data.status === 0) {
           const token = data.token;
           dispatch(setUserToken(token));
@@ -25,8 +24,7 @@ export const login = (username, password) => (dispatch) => {
 export const logout = (token) => (dispatch) => {
   return new Promise((resolve, reject) => {
     reqLogout(token)
-      .then((response) => {
-        const { data } = response;
+      .then((data) => {
         if (data.status === 0) {
           dispatch(resetUser());
           removeToken();

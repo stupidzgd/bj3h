@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Input, Select, Modal } from "antd";
+import { Form, Input, Modal } from "antd";
 const { TextArea } = Input;
 class EditUserForm extends Component {
   render() {
@@ -12,47 +12,29 @@ class EditUserForm extends Component {
       currentRowData,
     } = this.props;
     const { getFieldDecorator } = form;
-    const { id, name, role, description } = currentRowData;
-    const formItemLayout = {
-      labelCol: {
-        sm: { span: 4 },
-      },
-      wrapperCol: {
-        sm: { span: 16 },
-      },
-    };
+    const { username, name, description } = currentRowData;
     return (
       <Modal
-        title="编辑"
+        title="编辑用户"
         visible={visible}
         onCancel={onCancel}
         onOk={onOk}
         confirmLoading={confirmLoading}
+        width={500}
       >
-        <Form {...formItemLayout}>
-          <Form.Item label="用户ID:">
+        <Form layout="vertical">
+          <Form.Item label="账号">
             {getFieldDecorator("id", {
-              initialValue: id,
+              initialValue: username,
             })(<Input disabled />)}
           </Form.Item>
-          <Form.Item label="用户名称:">
+          <Form.Item label="用户名称">
             {getFieldDecorator("name", {
               rules: [{ required: true, message: "请输入用户名称!" }],
               initialValue: name,
             })(<Input placeholder="请输入用户名称" />)}
           </Form.Item>
-          <Form.Item label="用户角色:">
-            {getFieldDecorator("role", {
-              initialValue: role,
-            })(
-              <Select style={{ width: 120 }} disabled={id === "admin"}>
-                <Select.Option value="admin">admin</Select.Option>
-                <Select.Option value="editor">editor</Select.Option>
-                <Select.Option value="guest">guest</Select.Option>
-              </Select>
-            )}
-          </Form.Item>
-          <Form.Item label="用户描述:">
+          <Form.Item label="用户描述">
             {getFieldDecorator("description", {
               initialValue: description,
             })(<TextArea rows={4} placeholder="请输入用户描述" />)}

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` VARCHAR(50) NOT NULL UNIQUE,
   `name` VARCHAR(50) DEFAULT '',
   `password` VARCHAR(100) NOT NULL,
+  `status` TINYINT(1) DEFAULT 1,
   `description` TEXT DEFAULT '',
   `lastLoginTime` DATETIME DEFAULT NULL,
   `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -13,5 +14,5 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 插入初始管理员数据，密码为123456
-INSERT IGNORE INTO `users` (`username`, `name`, `password`, `description`) VALUES
-('admin', '管理员', '123456', '拥有系统内所有菜单和路由权限');
+INSERT IGNORE INTO `users` (`username`, `name`, `password`, `role`, `status`, `description`) VALUES
+('admin', '管理员', '', 1, '拥有系统内所有菜单和路由权限');

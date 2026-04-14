@@ -1,0 +1,61 @@
+@media (max-width: 768px) {
+  .ant-card-head-title {
+    padding: 12px 0;
+  }
+  
+  /* 调整搜索筛选区域布局 */
+  .ant-card-head-title .ant-row:first-child {
+    flex-direction: column;
+  }
+  
+  .ant-card-head-title .ant-row:first-child .ant-col {
+    width: 100% !important;
+    margin-bottom: 8px;
+  }
+  
+  .ant-card-head-title .ant-row:first-child .ant-col:last-child {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .ant-card-head-title .ant-row:first-child .ant-col:last-child button {
+    flex: 1;
+    margin: 0 4px;
+  }
+  
+  .ant-card-head-title .ant-row:first-child .ant-col:last-child button:first-child {
+    margin-left: 0;
+  }
+  
+  .ant-card-head-title .ant-row:first-child .ant-col:last-child button:last-child {
+    margin-right: 0;
+  }
+  
+  /* 表格容器添加横向滚动 */
+  .ant-card-body {
+    overflow-x: auto;
+  }
+  
+  /* 调整表格列宽 */
+  .ant-table {
+    min-width: 768px;
+  }
+  
+  .ant-table th {
+    white-space: nowrap;
+  }
+  
+  .ant-table td {
+    white-space: nowrap;
+  }
+  
+  /* 调整操作按钮区域 */
+  .ant-table-column-has-actions {
+    width: 200px !important;
+  }
+  
+  .ant-table-row-cell-break-word {
+    white-space: nowrap;
+  }
+}

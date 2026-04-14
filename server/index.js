@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 // 路由
 app.use('/api/excel', excelDataRoutes);
 app.use('/', authRoutes);
-app.use('/api', userRoutes);
+app.use('/', userRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

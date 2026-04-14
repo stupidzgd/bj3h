@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { connect } from "react-redux";
 import { Icon, Menu, Dropdown, Modal, Layout, Avatar, Form, Input, message } from "antd";
 import { Link } from "react-router-dom";
-import { logout, getUserInfo } from "@/store/actions";
+import { userLogout, getUserInfo } from "@/store/actions";
 import { updateProfile } from "@/api/user";
 import FullScreen from "@/components/FullScreen";
 import Settings from "@/components/Settings";
@@ -15,6 +15,89 @@ const { Header } = Layout;
 const { TextArea } = Input;
 const { create: FormCreate } = Form;
 
+// 修改密码表单组件
+const ChangePasswordForm = FormCreate()((props) => {
+  const { form, onOk, onCancel, loading, visible } = props;
+  const { getFieldDecorator } = form;
+  
+  // 当弹窗关闭时重置表单
+  React.useEffect(() => {
+    if (!visible) {
+      form.resetFields();
+    }
+  }, [visible, form]);
+  
+  const handleOk = () => {
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+      onOk(values);
+    });
+  };
+  
+  return (
+    <Modal
+      title="修改密码"
+      visible={visible}
+      onCancel={onCancel}
+      onOk={handleOk}
+      confirmLoading={loading}
+      width={400}
+    >
+      <Form layout="vertical">
+        <Form.Item label="旧密码" required>
+          {getFieldDecorator('oldPassword', {
+            rules: [{ required: true, message: '请输入旧密码' }],
+          })(
+            <Input.Password placeholder="旧密码" />
+          )}
+        </Form.Item>
+        <Form.Item label="新密码" required>
+          {getFieldDecorator('newPassword', {
+            rules: [
+              { required: true, message: '请输入新密码' },
+              { 
+                validator: (rule, value, callback) => {
+                  if (!value) {
+                    callback('请输入新密码');
+                  } else if (value === form.getFieldValue('oldPassword')) {
+                    callback('新密码不能与旧密码相同');
+                  } else {
+                    callback();
+                  }
+                }
+              }
+            ],
+          })(
+            <Input.Password placeholder="新密码" />
+          )}
+        </Form.Item>
+        <Form.Item label="确认新密码" required>
+          {getFieldDecorator('confirmNewPassword', {
+            rules: [
+              { required: true, message: '请确认新密码' },
+              { 
+                validator: (rule, value, callback) => {
+                  if (!value) {
+                    callback('请确认新密码');
+                  } else if (value !== form.getFieldValue('newPassword')) {
+                    callback('两次输入的密码不一致');
+                  } else {
+                    callback();
+                  }
+                }
+              }
+            ],
+          })(
+            <Input.Password placeholder="确认新密码" />
+          )}
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+});
+
 class LayoutHeader extends React.Component {
   constructor(props) {
     super(props);
@@ -22,8 +105,8 @@ class LayoutHeader extends React.Component {
       modalVisible: false,
       modalLoading: false,
       mobileDrawerVisible: false,
-      passwordKey: 0, // 用于重置密码输入框状态的key
-      confirmPasswordKey: 0, // 用于重置密码确认输入框状态的key
+      changePasswordModalVisible: false, // 修改密码弹窗状态
+      changePasswordLoading: false, // 修改密码加载状态
     };
   }
 
@@ -60,19 +143,14 @@ class LayoutHeader extends React.Component {
 
   // 打开个人信息模态框
   handleOpenModal = () => {
-    // 更新key值，强制重置密码输入框状态
     this.setState({
-      modalVisible: true,
-      passwordKey: this.state.passwordKey + 1,
-      confirmPasswordKey: this.state.confirmPasswordKey + 1
+      modalVisible: true
     }, () => {
       // 在模态框打开后设置表单数据
-      const { id, name, username, password, description } = this.props;
+      const { id, name, username, description } = this.props;
       this.props.form.setFieldsValue({
         id: username || String(id || name), // 使用username作为账号，确保是字符串类型
         name: name, // 使用name作为用户名称
-        password: password || "123456", // 使用从服务器返回的密码，默认123456
-        confirmPassword: password || "123456", // 使用从服务器返回的密码，默认123456
         description: description || "", // 使用description作为用户描述
       });
     });
@@ -99,20 +177,18 @@ class LayoutHeader extends React.Component {
         onOk: () => {
           this.setState({ modalLoading: true });
           // 调用修改个人信息的API
-          const { id, name, password, description } = values;
+          const { id, name, description } = values;
           // 构建请求参数
           const requestData = {
             username: id, // 账号不能修改，使用当前账号
             name,
-            password,
             description,
             token: this.props.token // 传递token用于验证
           };
           
           // 调用修改个人信息的API
           updateProfile(requestData)
-            .then((response) => {
-              const { data } = response;
+            .then((data) => {
               if (data.status === 0) {
                 this.setState({ modalLoading: false, modalVisible: false });
                 message.success('个人信息修改成功');
@@ -143,8 +219,60 @@ class LayoutHeader extends React.Component {
       okText: "确定",
       cancelText: "取消",
       onOk: () => {
-        this.props.logout(token);
+        this.props.userLogout(token);
       },
+    });
+  };
+
+  // 打开修改密码模态框
+  handleOpenChangePasswordModal = () => {
+    this.setState({
+      changePasswordModalVisible: true
+    });
+  };
+
+  // 关闭修改密码模态框
+  handleChangePasswordCancel = () => {
+    this.setState({ changePasswordModalVisible: false });
+  };
+
+  // 提交密码修改
+  handleChangePasswordSubmit = (values) => {
+    // 二次确认是否提交修改
+    Modal.confirm({
+      title: '确认修改',
+      content: '确定要修改密码吗？',
+      okText: '确定',
+      cancelText: '取消',
+      onOk: () => {
+        this.setState({ changePasswordLoading: true });
+        // 调用修改密码的API
+        const { oldPassword, newPassword } = values;
+        // 构建请求参数
+        const requestData = {
+          username: this.props.username || this.props.id, // 传递用户名
+          oldPassword,
+          newPassword,
+          token: this.props.token // 传递token用于验证
+        };
+        
+        // 调用修改密码的API
+        updateProfile(requestData)
+          .then((data) => {
+            if (data.status === 0) {
+              this.setState({ changePasswordLoading: false, changePasswordModalVisible: false });
+              message.success('密码修改成功');
+            } else {
+              this.setState({ changePasswordLoading: false });
+              message.error(data.message || '密码修改失败');
+            }
+          })
+          .catch((error) => {
+            this.setState({ changePasswordLoading: false });
+            message.error('密码修改失败');
+            console.error('修改密码错误:', error);
+          });
+      }
     });
   };
 
@@ -174,6 +302,9 @@ class LayoutHeader extends React.Component {
         break;
       case "editProfile":
         this.handleOpenModal();
+        break;
+      case "changePassword":
+        this.handleOpenChangePasswordModal();
         break;
       default:
         break;
@@ -213,6 +344,9 @@ class LayoutHeader extends React.Component {
         </Menu.Item>
         <Menu.Item key="editProfile">
           修改个人信息
+        </Menu.Item>
+        <Menu.Item key="changePassword">
+          修改密码
         </Menu.Item>
         {/* <Menu.Item key="project">
           <a
@@ -300,46 +434,6 @@ class LayoutHeader extends React.Component {
                     <Input placeholder="用户名称" />
                   )}
                 </Form.Item>
-                <Form.Item label="用户密码">
-                  {getFieldDecorator('password', {
-                    rules: [{ required: true, message: '请输入用户密码' }],
-                  })(
-                    <Input.Password 
-                      key={this.state.passwordKey}
-                      placeholder="用户密码" 
-                      onChange={() => {
-                        // 当密码变化时，校验密码确认字段
-                        this.props.form.validateFields(['confirmPassword']);
-                      }}
-                    />
-                  )}
-                </Form.Item>
-                <Form.Item label="密码确认">
-                  {getFieldDecorator('confirmPassword', {
-                    rules: [
-                      { 
-                        validator: (rule, value, callback) => {
-                          if (!value) {
-                            callback('请确认密码');
-                          } else if (value !== this.props.form.getFieldValue('password')) {
-                            callback('两次输入的密码不一致');
-                          } else {
-                            callback();
-                          }
-                        }
-                      }
-                    ],
-                  })(
-                    <Input.Password 
-                      key={this.state.confirmPasswordKey}
-                      placeholder="密码确认" 
-                      onChange={() => {
-                        // 当密码确认变化时，校验密码确认字段
-                        this.props.form.validateFields(['confirmPassword']);
-                      }}
-                    />
-                  )}
-                </Form.Item>
                 <Form.Item label="用户描述">
                   {getFieldDecorator('description')(
                     <TextArea rows={4} placeholder="用户描述" />
@@ -347,6 +441,15 @@ class LayoutHeader extends React.Component {
                 </Form.Item>
               </Form>
             </Modal>
+            
+            {/* 修改密码模态框 */}
+            <ChangePasswordForm
+              visible={this.state.changePasswordModalVisible}
+              onCancel={this.handleChangePasswordCancel}
+              onOk={this.handleChangePasswordSubmit}
+              loading={this.state.changePasswordLoading}
+            />
+
           </div>
         </Header>
         <MobileDrawer
@@ -366,4 +469,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { logout, getUserInfo })(FormCreate()(LayoutHeader));
+export default connect(mapStateToProps, { userLogout, getUserInfo })(FormCreate()(LayoutHeader));

@@ -8,24 +8,57 @@ export function reqUserInfo(data) {
   })
 }
 
-export function getUsers() {
+export function getUsers(params) {
   return request({
-    url: '/user/list',
-    method: 'get'
+    url: '/users',
+    method: 'get',
+    params
   })
 }
 
 export function deleteUser(data) {
   return request({
-    url: '/user/delete',
-    method: 'post',
+    url: '/user',
+    method: 'delete',
     data
   })
 }
 
 export function editUser(data) {
   return request({
-    url: '/user/edit',
+    url: '/user',
+    method: 'put',
+    data
+  })
+}
+
+export function addUser(data) {
+  return request({
+    url: '/user',
+    method: 'post',
+    data
+  })
+}
+
+export function updateUserStatus(data) {
+  return request({
+    url: '/user/status',
+    method: 'put',
+    data
+  })
+}
+
+export function resetPassword(data) {
+  return request({
+    url: '/user/reset-password',
+    method: 'put',
+    data
+  })
+}
+
+export function updateProfile(data) {
+  return request({
+    url: '/updateProfile',
     method: 'post',
     data
   })
@@ -39,17 +72,9 @@ export function reqValidatUserID(data) {
   })
 }
 
-export function addUser(data) {
+export function logout(data) {
   return request({
-    url: '/user/add',
-    method: 'post',
-    data
-  })
-}
-
-export function updateProfile(data) {
-  return request({
-    url: '/updateProfile',
+    url: '/logout',
     method: 'post',
     data
   })

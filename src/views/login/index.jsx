@@ -18,18 +18,6 @@ const Login = (props) => {
     login(username, password)
       .then((data) => {
         message.success("登录成功");
-        handleUserInfo(data.token);
-      })
-      .catch((error) => {
-        setLoading(false);
-        message.error(error);
-      });
-  };
-
-  // 获取用户信息
-  const handleUserInfo = (token) => {
-    getUserInfo(token)
-      .then((data) => {
         setLoading(false);
       })
       .catch((error) => {

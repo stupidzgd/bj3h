@@ -36,7 +36,7 @@ class TransactionTable extends Component {
   };
   fetchData = () => {
     transactionList().then((response) => {
-      const list = response.data.data.items.slice(0, 13);
+      const list = response.data.items.slice(0, 13);
       if (this._isMounted) { 
         this.setState({ list });
       }

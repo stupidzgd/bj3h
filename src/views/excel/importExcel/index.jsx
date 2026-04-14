@@ -428,7 +428,7 @@ class ImportExcel extends Component {
         try {
           // 发送数据到后端
           const response = await importExcelApi({ data: backendData });
-          message.success(`成功导入 ${response.data.total} 条数据到数据库，其中新创建 ${response.data.created} 条，更新 ${response.data.updated} 条`);
+          message.success(`成功导入 ${response.total} 条数据到数据库，其中新创建 ${response.created} 条，更新 ${response.updated} 条`);
           
           // 导入完成后清空表格数据
           this.setState({

@@ -54,7 +54,7 @@ export default [
   { path: "/system/test", component: SystemTest, roles: ["admin"] },
   // { path: "/zip", component: Zip, roles: ["admin","editor"] },
   // { path: "/clipboard", component: Clipboard, roles: ["admin","editor"] },
-  { path: "/user", component: User, roles: ["admin"] },
+  { path: "/user", component: User },
   // { path: "/about", component: About, roles: ["admin", "editor", "guest"] },
   // { path: "/bug", component: Bug, roles: ["admin"] },
   { path: "/error/404", component: Error404 },

@@ -177,15 +177,18 @@ const menuList = [
     ],
   },
   {
-    title: "系统测试",
+    title: "系统管理",
     path: "/system",
     icon: "setting",
-    roles:["admin"],
     children: [
       {
         title: "系统测试",
         path: "/system/test",
         roles:["admin"]
+      },
+      {
+        title: "用户管理",
+        path: "/user"
       },
     ],
   },
@@ -201,12 +204,6 @@ const menuList = [
     path: "/clipboard",
     icon: "copy",
     roles:["admin","editor"]
-  },
-{
-    title: "用户管理",
-    path: "/user",
-    icon: "usergroup-add",
-    roles:["admin"]
   },
   {
     title: "关于作者",

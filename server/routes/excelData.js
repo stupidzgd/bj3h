@@ -6,15 +6,27 @@ const MediaPublishData = require('../models/MediaPublishData');
 const ProvinceRatio = require('../models/ProvinceRatio');
 const { info, error, warn, debug } = require('../config/logger');
 
-// 获取所有数据
-router.get('/all', async (req, res) => {
+// 统一查询接口（支持GET和POST方法）
+router.get('/query', async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const { platform, department, departmentCategory, contentCategory, startDate, endDate, importStartDate, importEndDate, keyword } = req.query;
     
-    info(`获取所有数据请求，参数: startDate=${startDate}, endDate=${endDate}`);
+    info(`查询数据请求 (GET)，参数: platform=${platform}, department=${department}, departmentCategory=${departmentCategory}, contentCategory=${contentCategory}, startDate=${startDate}, endDate=${endDate}, importStartDate=${importStartDate}, importEndDate=${importEndDate}, keyword=${keyword}`);
     
     const where = {};
     
+    if (platform) {
+      where.platform = platform;
+    }
+    if (department) {
+      where.department_name = department;
+    }
+    if (departmentCategory) {
+      where.department_category = departmentCategory;
+    }
+    if (contentCategory) {
+      where.content_category = contentCategory;
+    }
     if (startDate && endDate) {
       where.publish_time = {
         [Op.between]: [new Date(startDate), new Date(endDate + ' 23:59:59')]
@@ -26,67 +38,6 @@ router.get('/all', async (req, res) => {
     } else if (endDate) {
       where.publish_time = {
         [Op.lte]: new Date(endDate + ' 23:59:59')
-      };
-    }
-    
-    const data = await MediaPublishData.findAll({
-      where,
-      include: [{
-        model: ProvinceRatio,
-        as: 'provinceRatios',
-        required: false // 使用左连接，确保即使没有关联数据也能返回
-      }]
-    });
-    
-    // 获取最大的 import_time
-    let lastUpdateTime = null;
-    if (data.length > 0) {
-      const maxImportTime = await MediaPublishData.max('import_time', { where });
-      if (maxImportTime) {
-        lastUpdateTime = maxImportTime.toISOString().slice(0, 19).replace('T', ' ');
-      }
-    }
-    
-    info(`数据库返回数据总量: ${data.length}`);
-    res.status(200).json({
-      data: data,
-      lastUpdateTime: lastUpdateTime
-    });
-  } catch (err) {
-    error('获取数据失败:', err);
-    res.status(500).json({ error: '获取数据失败' });
-  }
-});
-
-// 按条件查询数据
-router.post('/query', async (req, res) => {
-  try {
-    const { platform, department, contentCategory, startDate, endDate, importStartDate, importEndDate, keyword } = req.body;
-    
-    info(`按条件查询数据请求，参数: platform=${platform}, department=${department}, contentCategory=${contentCategory}, startDate=${startDate}, endDate=${endDate}, importStartDate=${importStartDate}, importEndDate=${importEndDate}, keyword=${keyword}`);
-    
-    const where = {};
-    
-    if (platform) {
-      where.platform = platform;
-    }
-    if (department) {
-      where.department_name = department;
-    }
-    if (contentCategory) {
-      where.content_category = contentCategory;
-    }
-    if (startDate && endDate) {
-      where.publish_time = {
-        [Op.between]: [new Date(startDate), new Date(endDate)]
-      };
-    } else if (startDate) {
-      where.publish_time = {
-        [Op.gte]: new Date(startDate)
-      };
-    } else if (endDate) {
-      where.publish_time = {
-        [Op.lte]: new Date(endDate)
       };
     }
     if (importStartDate && importEndDate) {
@@ -114,12 +65,109 @@ router.post('/query', async (req, res) => {
       where,
       include: [{
         model: ProvinceRatio,
-        as: 'provinceRatios'
+        as: 'provinceRatios',
+        required: false // 使用左连接，确保即使没有关联数据也能返回
       }]
     });
     
+    // 获取最大的 import_time
+    let lastUpdateTime = null;
+    if (data.length > 0) {
+      const maxImportTime = await MediaPublishData.max('import_time', { where });
+      if (maxImportTime) {
+        lastUpdateTime = maxImportTime.toISOString().slice(0, 19).replace('T', ' ');
+      }
+    }
+    
     info(`查询完成，返回数据总量: ${data.length}`);
-    res.status(200).json(data);
+    res.status(200).json({
+      data: data,
+      lastUpdateTime: lastUpdateTime
+    });
+  } catch (err) {
+    error('查询数据失败:', err);
+    res.status(500).json({ error: '查询数据失败' });
+  }
+});
+
+// 按条件查询数据 (POST 方法)
+router.post('/query', async (req, res) => {
+  try {
+    const { platform, department, departmentCategory, contentCategory, startDate, endDate, importStartDate, importEndDate, keyword } = req.body;
+    
+    info(`按条件查询数据请求 (POST)，参数: platform=${platform}, department=${department}, departmentCategory=${departmentCategory}, contentCategory=${contentCategory}, startDate=${startDate}, endDate=${endDate}, importStartDate=${importStartDate}, importEndDate=${importEndDate}, keyword=${keyword}`);
+    
+    const where = {};
+    
+    if (platform) {
+      where.platform = platform;
+    }
+    if (department) {
+      where.department_name = department;
+    }
+    if (departmentCategory) {
+      where.department_category = departmentCategory;
+    }
+    if (contentCategory) {
+      where.content_category = contentCategory;
+    }
+    if (startDate && endDate) {
+      where.publish_time = {
+        [Op.between]: [new Date(startDate), new Date(endDate + ' 23:59:59')]
+      };
+    } else if (startDate) {
+      where.publish_time = {
+        [Op.gte]: new Date(startDate)
+      };
+    } else if (endDate) {
+      where.publish_time = {
+        [Op.lte]: new Date(endDate + ' 23:59:59')
+      };
+    }
+    if (importStartDate && importEndDate) {
+      where.import_time = {
+        [Op.between]: [new Date(importStartDate), new Date(importEndDate + ' 23:59:59')]
+      };
+    } else if (importStartDate) {
+      where.import_time = {
+        [Op.gte]: new Date(importStartDate)
+      };
+    } else if (importEndDate) {
+      where.import_time = {
+        [Op.lte]: new Date(importEndDate + ' 23:59:59')
+      };
+    }
+    if (keyword) {
+      where[Op.or] = [
+        { title: { [Op.like]: `%${keyword}%` } },
+        { author: { [Op.like]: `%${keyword}%` } },
+        { reporter: { [Op.like]: `%${keyword}%` } }
+      ];
+    }
+    
+    const data = await MediaPublishData.findAll({ 
+      where,
+      include: [{
+        model: ProvinceRatio,
+        as: 'provinceRatios',
+        required: false // 使用左连接，确保即使没有关联数据也能返回
+      }]
+    });
+    
+    // 获取最大的 import_time
+    let lastUpdateTime = null;
+    if (data.length > 0) {
+      const maxImportTime = await MediaPublishData.max('import_time', { where });
+      if (maxImportTime) {
+        lastUpdateTime = maxImportTime.toISOString().slice(0, 19).replace('T', ' ');
+      }
+    }
+    
+    info(`查询完成，返回数据总量: ${data.length}`);
+    res.status(200).json({
+      data: data,
+      lastUpdateTime: lastUpdateTime
+    });
   } catch (err) {
     error('查询数据失败:', err);
     res.status(500).json({ error: '查询数据失败' });
