@@ -276,6 +276,9 @@ class ComprehensiveQuery extends Component {
   getPlatformOptions() {
     const { tableData } = this.state;
     const platforms = [...new Set(tableData.map(item => item['平台']).filter(Boolean))];
+    if (platforms.length === 0) {
+      return [<Option key="no-data" value="">暂无数据</Option>];
+    }
     return platforms.map(platform => (
       <Option key={platform} value={platform}>{platform}</Option>
     ));
@@ -291,7 +294,11 @@ class ComprehensiveQuery extends Component {
         depts.forEach(dept => departments.add(dept));
       }
     });
-    return Array.from(departments).map(dept => (
+    const deptArray = Array.from(departments);
+    if (deptArray.length === 0) {
+      return [<Option key="no-data" value="">暂无数据</Option>];
+    }
+    return deptArray.map(dept => (
       <Option key={dept} value={dept}>{dept}</Option>
     ));
   }
@@ -299,7 +306,11 @@ class ComprehensiveQuery extends Component {
   // 获取内容分类选项
   getContentCategoryOptions() {
     // 使用统一的字典配置
-    return Object.entries(CONTENT_CATEGORY_MAP).map(([code, name]) => (
+    const contentCategories = Object.entries(CONTENT_CATEGORY_MAP);
+    if (contentCategories.length === 0) {
+      return [<Option key="no-data" value="">暂无数据</Option>];
+    }
+    return contentCategories.map(([code, name]) => (
       <Option key={code} value={code}>{name}</Option>
     ));
   }
@@ -321,7 +332,11 @@ class ComprehensiveQuery extends Component {
       }
     });
     
-    return Array.from(categories).map(category => (
+    const categoryArray = Array.from(categories);
+    if (categoryArray.length === 0) {
+      return [<Option key="no-data" value="">暂无数据</Option>];
+    }
+    return categoryArray.map(category => (
       <Option key={category} value={category}>{category}</Option>
     ));
   }
