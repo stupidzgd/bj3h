@@ -106,7 +106,7 @@ INSERT INTO `dict_type` (`type_code`, `type_name`, `description`) VALUES
 -- 内容分类字典项
 INSERT INTO `dict_item` (`type_code`, `item_code`, `item_name`, `sort_order`) VALUES
 ('content_category', '1', '医院新闻', 1),
-('content_category', '2', '医院科普', 2),
+('content_category', '2', '医学科普', 2),
 ('content_category', '3', '就诊信息', 3),
 ('content_category', '4', '医学人文', 4),
 ('content_category', '5', '医疗技术', 5),

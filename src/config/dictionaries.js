@@ -4,7 +4,7 @@
 // 内容分类字典
 export const CONTENT_CATEGORY_MAP = {
   '1': '医院新闻',
-  '2': '医院科普',
+  '2': '医学科普',
   '3': '就诊信息',
   '4': '医学人文',
   '5': '医疗技术',
@@ -14,7 +14,7 @@ export const CONTENT_CATEGORY_MAP = {
 // 内容分类反向字典
 export const CONTENT_CATEGORY_REVERSE_MAP = {
   '医院新闻': '1',
-  '医院科普': '2',
+  '医学科普': '2',
   '就诊信息': '3',
   '医学人文': '4',
   '医疗技术': '5',

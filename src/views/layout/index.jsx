@@ -7,6 +7,7 @@ import Sider from "./Sider";
 import TagsView from "./TagsView";
 import { Layout } from "antd";
 import { isSmallScreen, onResize } from "@/utils/device";
+import { fetchDictionaries } from "@/store/actions/dictionary";
 const Main = (props) => {
   const { tagsView } = props;
   const [isSmall, setIsSmall] = useState(isSmallScreen());
@@ -18,6 +19,9 @@ const Main = (props) => {
     const unsubscribe = onResize(() => {
       setIsSmall(isSmallScreen());
     });
+
+    // 加载字典数据
+    props.fetchDictionaries();
 
     // 清理函数
     return () => {
@@ -132,4 +136,4 @@ const Main = (props) => {
     </Layout>
   );
 };
-export default connect((state) => state.settings)(Main);
+export default connect((state) => state.settings, { fetchDictionaries })(Main);

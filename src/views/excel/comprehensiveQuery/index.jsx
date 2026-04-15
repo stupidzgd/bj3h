@@ -19,11 +19,6 @@ class ComprehensiveQuery extends Component {
     filterPanelExpanded: false
   };
 
-  componentDidMount() {
-    // 直接从后端获取数据
-    this.fetchData();
-  }
-
   // 从后端获取数据
   fetchData = async () => {
     this.setState({ loading: true });
@@ -274,70 +269,56 @@ class ComprehensiveQuery extends Component {
 
   // 获取平台选项
   getPlatformOptions() {
-    const { tableData } = this.state;
-    const platforms = [...new Set(tableData.map(item => item['平台']).filter(Boolean))];
+    const { dictionaries } = this.props;
+    const platforms = dictionaries && dictionaries.platforms ? dictionaries.platforms : [];
     if (platforms.length === 0) {
       return [<Option key="no-data" value="">暂无数据</Option>];
     }
     return platforms.map(platform => (
-      <Option key={platform} value={platform}>{platform}</Option>
+      <Option key={platform.code} value={platform.name}>{platform.name}</Option>
     ));
   }
 
   // 获取科室选项
   getDepartmentOptions() {
-    const { tableData } = this.state;
-    const departments = new Set();
-    tableData.forEach(item => {
-      if (item['科室名称']) {
-        const depts = item['科室名称'].split('、');
-        depts.forEach(dept => departments.add(dept));
-      }
-    });
-    const deptArray = Array.from(departments);
-    if (deptArray.length === 0) {
+    const { dictionaries } = this.props;
+    const departments = dictionaries && dictionaries.departments ? dictionaries.departments : [];
+    if (departments.length === 0) {
       return [<Option key="no-data" value="">暂无数据</Option>];
     }
-    return deptArray.map(dept => (
-      <Option key={dept} value={dept}>{dept}</Option>
+    return departments.map(department => (
+      <Option key={department.code} value={department.name}>{department.name}</Option>
     ));
   }
 
   // 获取内容分类选项
   getContentCategoryOptions() {
-    // 使用统一的字典配置
-    const contentCategories = Object.entries(CONTENT_CATEGORY_MAP);
+    const { dictionaries } = this.props;
+    const contentCategories = dictionaries && dictionaries.contentCategories ? dictionaries.contentCategories : [];
     if (contentCategories.length === 0) {
-      return [<Option key="no-data" value="">暂无数据</Option>];
+      // 使用统一的字典配置作为备用
+      const contentCategoriesFromConfig = Object.entries(CONTENT_CATEGORY_MAP);
+      if (contentCategoriesFromConfig.length === 0) {
+        return [<Option key="no-data" value="">暂无数据</Option>];
+      }
+      return contentCategoriesFromConfig.map(([code, name]) => (
+        <Option key={code} value={name}>{name}</Option>
+      ));
     }
-    return contentCategories.map(([code, name]) => (
-      <Option key={code} value={code}>{name}</Option>
+    return contentCategories.map(category => (
+      <Option key={category.code} value={category.name}>{category.name}</Option>
     ));
   }
 
   // 获取科室分类选项
   getDepartmentCategoryOptions() {
-    const { tableData } = this.state;
-    const categories = new Set();
-    
-    tableData.forEach(item => {
-      if (item['科室分类']) {
-        // 拆分科室分类（如果包含顿号）
-        const deptCategories = item['科室分类'].split('、');
-        deptCategories.forEach(dept => {
-          if (dept.trim()) {
-            categories.add(dept.trim());
-          }
-        });
-      }
-    });
-    
-    const categoryArray = Array.from(categories);
-    if (categoryArray.length === 0) {
+    const { dictionaries } = this.props;
+    const departmentCategories = dictionaries && dictionaries.departmentCategories ? dictionaries.departmentCategories : [];
+    if (departmentCategories.length === 0) {
       return [<Option key="no-data" value="">暂无数据</Option>];
     }
-    return categoryArray.map(category => (
-      <Option key={category} value={category}>{category}</Option>
+    return departmentCategories.map(category => (
+      <Option key={category.code} value={category.name}>{category.name}</Option>
     ));
   }
 
@@ -479,7 +460,7 @@ class ComprehensiveQuery extends Component {
         platform: filters.platform.length > 0 ? filters.platform : undefined,
         department: filters.department.length > 0 ? filters.department : undefined,
         departmentCategory: filters.departmentCategory.length > 0 ? filters.departmentCategory : undefined,
-        contentCategory: filters.contentCategory.length > 0 ? filters.contentCategory : undefined,
+        contentCategory: filters.contentCategory.length > 0 ? filters.contentCategory[0] : undefined,
         startDate: filters.dateRange && filters.dateRange.length === 2 ? filters.dateRange[0].format('YYYY-MM-DD') : undefined,
         endDate: filters.dateRange && filters.dateRange.length === 2 ? filters.dateRange[1].format('YYYY-MM-DD') : undefined,
         importStartDate: filters.importDateRange && filters.importDateRange.length === 2 ? filters.importDateRange[0].format('YYYY-MM-DD') : undefined,
@@ -943,7 +924,8 @@ class ComprehensiveQuery extends Component {
 }
 
 const mapStateToProps = state => ({
-  queryFilters: state.app.queryFilters
+  queryFilters: state.app.queryFilters,
+  dictionaries: state.dictionary.data
 });
 
 export default connect(mapStateToProps, { setQueryFilters, clearQueryFilters })(ComprehensiveQuery);

@@ -16,16 +16,40 @@ router.get('/query', async (req, res) => {
     const where = {};
     
     if (platform) {
-      where.platform = platform;
+      if (Array.isArray(platform) && platform.length > 0) {
+        where.platform = {
+          [Op.in]: platform
+        };
+      } else if (typeof platform === 'string') {
+        where.platform = platform;
+      }
     }
     if (department) {
-      where.department_name = department;
+      if (Array.isArray(department) && department.length > 0) {
+        where.department_name = {
+          [Op.in]: department
+        };
+      } else if (typeof department === 'string') {
+        where.department_name = department;
+      }
     }
     if (departmentCategory) {
-      where.department_category = departmentCategory;
+      if (Array.isArray(departmentCategory) && departmentCategory.length > 0) {
+        where.department_category = {
+          [Op.in]: departmentCategory
+        };
+      } else if (typeof departmentCategory === 'string') {
+        where.department_category = departmentCategory;
+      }
     }
     if (contentCategory) {
-      where.content_category = contentCategory;
+      if (Array.isArray(contentCategory) && contentCategory.length > 0) {
+        where.content_category = {
+          [Op.in]: contentCategory
+        };
+      } else if (typeof contentCategory === 'string') {
+        where.content_category = contentCategory;
+      }
     }
     if (startDate && endDate) {
       where.publish_time = {
@@ -95,21 +119,46 @@ router.post('/query', async (req, res) => {
   try {
     const { platform, department, departmentCategory, contentCategory, startDate, endDate, importStartDate, importEndDate, keyword } = req.body;
     
-    info(`按条件查询数据请求 (POST)，参数: platform=${platform}, department=${department}, departmentCategory=${departmentCategory}, contentCategory=${contentCategory}, startDate=${startDate}, endDate=${endDate}, importStartDate=${importStartDate}, importEndDate=${importEndDate}, keyword=${keyword}`);
+    info(`按条件查询数据请求 (POST)，参数: platform=${platform}, department=${department}, departmentCategory=${departmentCategory}, contentCategory=${JSON.stringify(contentCategory)}, startDate=${startDate}, endDate=${endDate}, importStartDate=${importStartDate}, importEndDate=${importEndDate}, keyword=${keyword}`);
+    debug(`contentCategory类型: ${typeof contentCategory}, 是否为数组: ${Array.isArray(contentCategory)}`);
     
     const where = {};
     
     if (platform) {
-      where.platform = platform;
+      if (Array.isArray(platform) && platform.length > 0) {
+        where.platform = {
+          [Op.in]: platform
+        };
+      } else if (typeof platform === 'string') {
+        where.platform = platform;
+      }
     }
     if (department) {
-      where.department_name = department;
+      if (Array.isArray(department) && department.length > 0) {
+        where.department_name = {
+          [Op.in]: department
+        };
+      } else if (typeof department === 'string') {
+        where.department_name = department;
+      }
     }
     if (departmentCategory) {
-      where.department_category = departmentCategory;
+      if (Array.isArray(departmentCategory) && departmentCategory.length > 0) {
+        where.department_category = {
+          [Op.in]: departmentCategory
+        };
+      } else if (typeof departmentCategory === 'string') {
+        where.department_category = departmentCategory;
+      }
     }
     if (contentCategory) {
-      where.content_category = contentCategory;
+      if (Array.isArray(contentCategory) && contentCategory.length > 0) {
+        where.content_category = {
+          [Op.in]: contentCategory
+        };
+      } else if (typeof contentCategory === 'string') {
+        where.content_category = contentCategory;
+      }
     }
     if (startDate && endDate) {
       where.publish_time = {

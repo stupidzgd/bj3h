@@ -190,6 +190,10 @@ const menuList = [
         title: "用户管理",
         path: "/user"
       },
+      {
+        title: "字典管理",
+        path: "/system/dictionary"
+      }
     ],
   },
   /*

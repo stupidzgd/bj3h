@@ -4,11 +4,13 @@ import app from "./app";
 import settings from "./settings";
 import tagsView from "./tagsView";
 import monitor from "./monitor";
+import dictionary from "./dictionary";
 
 export default combineReducers({
   user,
   app,
   settings,
   tagsView,
-  monitor
+  monitor,
+  dictionary
 });
