@@ -19,7 +19,7 @@ const Department = sequelize.define('Department', {
   },
   departmentCategoryId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: DepartmentCategory,
       key: 'id'

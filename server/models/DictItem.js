@@ -27,15 +27,6 @@ const DictItem = sequelize.define('DictItem', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
     comment: '排序顺序'
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-    onUpdate: DataTypes.NOW
   }
 }, {
   tableName: 'dict_item',

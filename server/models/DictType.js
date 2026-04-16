@@ -21,15 +21,6 @@ const DictType = sequelize.define('DictType', {
   description: {
     type: DataTypes.STRING(255),
     comment: '描述'
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-    onUpdate: DataTypes.NOW
   }
 }, {
   tableName: 'dict_type',

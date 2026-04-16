@@ -3,33 +3,6 @@ CREATE DATABASE IF NOT EXISTS `bj3h` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8m
 
 USE `bj3h`;
 
--- 创建DictType表
-CREATE TABLE IF NOT EXISTS `dict_type` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `type_code` VARCHAR(50) NOT NULL COMMENT '字典类型编码',
-  `type_name` VARCHAR(100) NOT NULL COMMENT '字典类型名称',
-  `description` VARCHAR(255) COMMENT '描述',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `unique_type_code` (`type_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 创建DictItem表
-CREATE TABLE IF NOT EXISTS `dict_item` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `type_code` VARCHAR(50) NOT NULL COMMENT '字典类型编码',
-  `item_code` VARCHAR(50) NOT NULL COMMENT '字典项编码',
-  `item_name` VARCHAR(100) NOT NULL COMMENT '字典项名称',
-  `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `unique_type_item` (`type_code`, `item_code`),
-  INDEX `idx_type_code` (`type_code`),
-  CONSTRAINT `fk_dict_item_type` FOREIGN KEY (`type_code`) REFERENCES `dict_type` (`type_code`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- 创建MediaPublishData表
 CREATE TABLE IF NOT EXISTS `media_publish_data` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -78,10 +51,6 @@ CREATE TABLE IF NOT EXISTS `province_ratio` (
   CONSTRAINT `fk_media_publish_id` FOREIGN KEY (`media_publish_id`) REFERENCES `media_publish_data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 初始化字典数据
--- 平台类型字典
-INSERT INTO `dict_type` (`type_code`, `type_name`, `description`) VALUES
-('platform', '平台类型', '媒体发布平台类型');
 
 -- 平台类型字典项
 INSERT INTO `dict_item` (`type_code`, `item_code`, `item_name`, `sort_order`) VALUES

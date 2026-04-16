@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const ProvinceRatio = require('./ProvinceRatio');
-const DictItem = require('./DictItem');
 
 const MediaPublishData = sequelize.define('MediaPublishData', {
   id: {
