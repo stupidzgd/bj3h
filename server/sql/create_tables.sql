@@ -96,7 +96,7 @@ INSERT INTO `dict_item` (`type_code`, `item_code`, `item_name`, `sort_order`) VA
 ('platform', 'I', '自媒体（官网）', 9),
 ('platform', 'J', '媒体（电视）', 10),
 ('platform', 'K', '媒体（网络）', 11),
-('platform', 'L', '媒体（报刊）', 12),
+('platform', 'L', '媒体（报纸）', 12),
 ('platform', 'M', '媒体（音频）', 13);
 
 -- 内容分类字典

@@ -81,27 +81,27 @@ app.get('/health', (req, res) => {
 const initializeData = async () => {
   try {
     // 初始化平台数据
+    // 先清空现有平台数据
+    await Platform.destroy({ where: {} });
+    
     const platformData = [
       { code: 'A', name: '微信订阅号', type: 1, description: '微信订阅号平台', status: 1, sort: 1 },
-      { code: 'B', name: '微信视频号', type: 1, description: '微信视频号平台', status: 1, sort: 2 },
-      { code: 'C', name: '微博', type: 1, description: '微博平台', status: 1, sort: 3 },
-      { code: 'D', name: '快手', type: 1, description: '快手平台', status: 1, sort: 4 },
-      { code: 'E', name: '抖音', type: 1, description: '抖音平台', status: 1, sort: 5 },
+      { code: 'B', name: '微信服务号', type: 1, description: '微信服务号平台', status: 1, sort: 2 },
+      { code: 'C', name: '微信视频号', type: 1, description: '微信视频号平台', status: 1, sort: 3 },
+      { code: 'D', name: '抖音', type: 1, description: '抖音平台', status: 1, sort: 4 },
+      { code: 'E', name: '快手', type: 1, description: '快手平台', status: 1, sort: 5 },
       { code: 'F', name: 'B站', type: 1, description: 'B站平台', status: 1, sort: 6 },
       { code: 'G', name: '小红书', type: 1, description: '小红书平台', status: 1, sort: 7 },
-      { code: 'H', name: '喜马拉雅', type: 1, description: '喜马拉雅平台', status: 1, sort: 8 },
-      { code: 'I', name: '官网', type: 1, description: '医院官方网站', status: 1, sort: 9 },
-      { code: 'J', name: '媒体（电视）', type: 0, description: '电视媒体', status: 1, sort: 10 },
-      { code: 'K', name: '媒体（网络）', type: 0, description: '网络媒体', status: 1, sort: 11 },
-      { code: 'L', name: '媒体（报刊）', type: 0, description: '报刊媒体', status: 1, sort: 12 },
-      { code: 'M', name: '媒体（音频）', type: 0, description: '音频媒体', status: 1, sort: 13 }
+      { code: 'I', name: '喜马拉雅', type: 1, description: '喜马拉雅平台', status: 1, sort: 8 },
+      { code: 'J', name: '媒体（电视）', type: 0, description: '电视媒体', status: 1, sort: 9 },
+      { code: 'K', name: '媒体（报纸）', type: 0, description: '报纸媒体', status: 1, sort: 10 },
+      { code: 'L', name: '媒体（网络）', type: 0, description: '网络媒体', status: 1, sort: 11 },
+      { code: 'M', name: '媒体（音频）', type: 0, description: '音频媒体', status: 1, sort: 12 },
+      { code: 'X', name: '院报', type: 0, description: '医院内部报纸', status: 1, sort: 13 }
     ];
     
     for (const platform of platformData) {
-      await Platform.findOrCreate({
-        where: { code: platform.code },
-        defaults: platform
-      });
+      await Platform.create(platform);
     }
     
     // 初始化内容分类数据
