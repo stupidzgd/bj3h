@@ -5,7 +5,7 @@ import moment from "moment";
 import { setExcelData, clearExcelData } from "@/store/actions/app";
 import { importExcel as importExcelApi, clearExcelData as clearExcelDataApi } from "@/api/excel";
 import UploadExcelComponent from "@/components/UploadExcel";
-import { PLATFORM_MAP, CONTENT_CATEGORY_REVERSE_MAP } from "@/config/dictionaries";
+import { PLATFORM_MAP } from "@/config/dictionaries";
 class ImportExcel extends Component {
   state = {
     tableData: [],
@@ -47,9 +47,6 @@ class ImportExcel extends Component {
     
     // 平台字典映射（使用统一配置）
     const platformMap = PLATFORM_MAP;
-
-    // 内容分类字典映射（使用统一配置）
-    const contentCategoryMap = CONTENT_CATEGORY_REVERSE_MAP;
     
     // 转换数据格式，适配后端数据库
     const backendData = processedResults.map(item => {
@@ -83,7 +80,7 @@ class ImportExcel extends Component {
         avg_play_time: item['平均播放时长'] || null,
         like_count: item['点赞量'] ? parseInt(item['点赞量']) : null,
         collect_count: item['收藏量'] ? parseInt(item['收藏量']) : null,
-        content_category: contentCategoryMap[item['内容分类']] || item['内容分类'] || null,
+        content_category: item['内容分类'] || null,
         genre_category: item['体裁分类'] || null,
         department_name: item['科室名称'] || null,
         department_category: item['科室分类'] || null,

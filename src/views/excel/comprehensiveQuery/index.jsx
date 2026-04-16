@@ -460,7 +460,7 @@ class ComprehensiveQuery extends Component {
         platform: filters.platform.length > 0 ? filters.platform : undefined,
         department: filters.department.length > 0 ? filters.department : undefined,
         departmentCategory: filters.departmentCategory.length > 0 ? filters.departmentCategory : undefined,
-        contentCategory: filters.contentCategory.length > 0 ? filters.contentCategory[0] : undefined,
+        contentCategory: filters.contentCategory.length > 0 ? filters.contentCategory : undefined,
         startDate: filters.dateRange && filters.dateRange.length === 2 ? filters.dateRange[0].format('YYYY-MM-DD') : undefined,
         endDate: filters.dateRange && filters.dateRange.length === 2 ? filters.dateRange[1].format('YYYY-MM-DD') : undefined,
         importStartDate: filters.importDateRange && filters.importDateRange.length === 2 ? filters.importDateRange[0].format('YYYY-MM-DD') : undefined,

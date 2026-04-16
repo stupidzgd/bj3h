@@ -135,29 +135,35 @@ router.post('/query', async (req, res) => {
     }
     if (department) {
       if (Array.isArray(department) && department.length > 0) {
-        where.department_name = {
-          [Op.in]: department
-        };
+        where[Op.or] = department.map(dept => ({
+          department_name: { [Op.like]: `%${dept}%` }
+        }));
       } else if (typeof department === 'string') {
-        where.department_name = department;
+        where.department_name = {
+          [Op.like]: `%${department}%`
+        };
       }
     }
     if (departmentCategory) {
       if (Array.isArray(departmentCategory) && departmentCategory.length > 0) {
-        where.department_category = {
-          [Op.in]: departmentCategory
-        };
+        where[Op.or] = departmentCategory.map(cat => ({
+          department_category: { [Op.like]: `%${cat}%` }
+        }));
       } else if (typeof departmentCategory === 'string') {
-        where.department_category = departmentCategory;
+        where.department_category = {
+          [Op.like]: `%${departmentCategory}%`
+        };
       }
     }
     if (contentCategory) {
       if (Array.isArray(contentCategory) && contentCategory.length > 0) {
-        where.content_category = {
-          [Op.in]: contentCategory
-        };
+        where[Op.or] = contentCategory.map(cat => ({
+          content_category: { [Op.like]: `%${cat}%` }
+        }));
       } else if (typeof contentCategory === 'string') {
-        where.content_category = contentCategory;
+        where.content_category = {
+          [Op.like]: `%${contentCategory}%`
+        };
       }
     }
     if (startDate && endDate) {
@@ -193,7 +199,11 @@ router.post('/query', async (req, res) => {
         { reporter: { [Op.like]: `%${keyword}%` } }
       ];
     }
-    
+    info(11111111111,where, [{
+        model: ProvinceRatio,
+        as: 'provinceRatios',
+        required: false // 使用左连接，确保即使没有关联数据也能返回
+      }]);
     const data = await MediaPublishData.findAll({ 
       where,
       include: [{
