@@ -6,8 +6,7 @@ const menuList = [
   {
     title: "首页",
     path: "/dashboard",
-    icon: "home",
-    roles:["admin","editor","guest"]
+    icon: "home"
   },
     /*
   {
@@ -26,8 +25,7 @@ const menuList = [
   {
     title: "数据导入",
     path: "/import",
-    icon: "key",
-    roles:["admin","editor","guest"]
+    icon: "key"
   },
   /*
   {
@@ -162,17 +160,14 @@ const menuList = [
     title: "数据分析",
     path: "/analysis",
     icon: "area-chart",
-    roles:["admin","editor"],
     children: [
       {
         title: "综合查询",
-        path: "/analysis/comprehensive",
-        roles:["admin","editor"]
+        path: "/analysis/comprehensive"
       },
       {
         title: "数据指标分析",
-        path: "/analysis/overview",
-        roles:["admin","editor"]
+        path: "/analysis/overview"
       },
     ],
   },
@@ -183,16 +178,17 @@ const menuList = [
     children: [
       {
         title: "系统测试",
-        path: "/system/test",
-        roles:["admin"]
+        path: "/system/test"
       },
       {
         title: "用户管理",
-        path: "/user"
+        path: "/user",
+        roles: ["zgd"]
       },
       {
         title: "字典管理",
-        path: "/system/dictionary"
+        path: "/system/dictionary",
+        roles: ["zgd"]
       }
     ],
   },

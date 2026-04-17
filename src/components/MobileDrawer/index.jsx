@@ -86,32 +86,48 @@ class MobileDrawer extends React.Component {
     this.props.onClose();
   };
 
+  // 权限控制逻辑，与PC端保持一致
+  filterMenuItem = (item) => {
+    // 如果菜单项没有roles属性，则显示
+    if (!item.roles || item.roles.length === 0) {
+      return true;
+    }
+    // 从Redux store获取当前用户名
+    const currentUser = this.props.username;
+    // 只有当当前用户名在roles数组中时才显示
+    return item.roles.includes(currentUser);
+  };
+
   renderMenu = (menuList) => {
-    return menuList.map(item => {
-      if (item.children) {
-        return (
-          <SubMenu
-            key={item.path}
-            title={
-              <span>
+    return menuList.reduce((pre, item) => {
+      if (this.filterMenuItem(item)) {
+        if (item.children) {
+          pre.push(
+            <SubMenu
+              key={item.path}
+              title={
+                <span>
+                  <Icon type={item.icon} />
+                  <span>{item.title}</span>
+                </span>
+              }
+            >
+              {this.renderMenu(item.children)}
+            </SubMenu>
+          );
+        } else {
+          pre.push(
+            <Menu.Item key={item.path}>
+              <Link to={item.path}>
                 <Icon type={item.icon} />
                 <span>{item.title}</span>
-              </span>
-            }
-          >
-            {this.renderMenu(item.children)}
-          </SubMenu>
-        );
+              </Link>
+            </Menu.Item>
+          );
+        }
       }
-      return (
-        <Menu.Item key={item.path}>
-          <Link to={item.path}>
-            <Icon type={item.icon} />
-            <span>{item.title}</span>
-          </Link>
-        </Menu.Item>
-      );
-    });
+      return pre;
+    }, []);
   };
 
   render() {
@@ -155,4 +171,4 @@ class MobileDrawer extends React.Component {
   }
 }
 
-export default withRouter(connect()(MobileDrawer));
+export default withRouter(connect((state) => ({ ...state.user }))(MobileDrawer));

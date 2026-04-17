@@ -1,4 +1,4 @@
-import { setUserToken, resetUser } from "./user";
+import { setUserToken, resetUser, setUserInfo } from "./user";
 import { reqLogin, reqLogout } from "@/api/login";
 import { setToken, removeToken } from "@/utils/auth";
 export const login = (username, password) => (dispatch) => {
@@ -9,6 +9,8 @@ export const login = (username, password) => (dispatch) => {
           const token = data.token;
           dispatch(setUserToken(token));
           setToken(token);
+          // 登录成功后直接设置用户信息，确保username可用
+          dispatch(setUserInfo({ username: username.trim() }));
           resolve(data);
         } else {
           const msg = data.message;

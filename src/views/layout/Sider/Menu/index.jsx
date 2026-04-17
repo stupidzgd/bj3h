@@ -17,8 +17,14 @@ class SidebarMenu extends Component {
 
   // filterMenuItem用来根据配置信息筛选可以显示的菜单项
   filterMenuItem = (item) => {
-    // 注释掉权限控制逻辑，显示所有菜单
-    return true;
+    // 如果菜单项没有roles属性，则显示
+    if (!item.roles || item.roles.length === 0) {
+      return true;
+    }
+    // 从Redux store获取当前用户名
+    const currentUser = this.props.username;
+    // 只有当当前用户名在roles数组中时才显示
+    return item.roles.includes(currentUser);
   };
   // 菜单渲染
   getMenuNodes = (menuList) => {
@@ -97,6 +103,17 @@ class SidebarMenu extends Component {
         openKey,
       });
     }
+    
+    // 当用户名变化时，重新生成菜单树
+    if (prevProps.username !== this.props.username) {
+      const path = this.props.location.pathname;
+      const openKey = this.getDefaultOpenKeys(menuList, path);
+      const menuTreeNode = this.getMenuNodes(menuList);
+      this.setState({
+        menuTreeNode,
+        openKey,
+      });
+    }
   }
   render() {
     const path = this.props.location.pathname;
@@ -119,4 +136,4 @@ class SidebarMenu extends Component {
   }
 }
 
-export default connect((state) => state.user, { addTag })(withRouter(SidebarMenu));
+export default connect((state) => ({ ...state.user }), { addTag })(withRouter(SidebarMenu));
