@@ -11,7 +11,8 @@ export const fetchDictionaries = () => async (dispatch) => {
   dispatch({ type: FETCH_DICTIONARIES_REQUEST });
   try {
     const response = await axios.get('/api/dictionaries/frontend');
-    if (response.status === 0) {
+    // 检查API响应是否成功，根据实际API返回格式调整
+    if (response.data) {
       const data = response.data;
       dispatch({
         type: FETCH_DICTIONARIES_SUCCESS,
@@ -20,7 +21,7 @@ export const fetchDictionaries = () => async (dispatch) => {
     } else {
       dispatch({
         type: FETCH_DICTIONARIES_FAILURE,
-        payload: response.message || '获取字典数据失败'
+        payload: '获取字典数据失败'
       });
     }
   } catch (error) {

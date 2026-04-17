@@ -271,10 +271,12 @@ class ComprehensiveQuery extends Component {
   getPlatformOptions() {
     const { dictionaries } = this.props;
     const platforms = dictionaries && dictionaries.platforms ? dictionaries.platforms : [];
-    if (platforms.length === 0) {
+    // 只展示启用的平台
+    const enabledPlatforms = platforms.filter(platform => platform.status === 1);
+    if (enabledPlatforms.length === 0) {
       return [<Option key="no-data" value="">暂无数据</Option>];
     }
-    return platforms.map(platform => (
+    return enabledPlatforms.map(platform => (
       <Option key={platform.code} value={platform.name}>{platform.name}</Option>
     ));
   }
@@ -283,10 +285,12 @@ class ComprehensiveQuery extends Component {
   getDepartmentOptions() {
     const { dictionaries } = this.props;
     const departments = dictionaries && dictionaries.departments ? dictionaries.departments : [];
-    if (departments.length === 0) {
+    // 只展示启用的科室
+    const enabledDepartments = departments.filter(department => department.status === 1);
+    if (enabledDepartments.length === 0) {
       return [<Option key="no-data" value="">暂无数据</Option>];
     }
-    return departments.map(department => (
+    return enabledDepartments.map(department => (
       <Option key={department.code} value={department.name}>{department.name}</Option>
     ));
   }
@@ -295,7 +299,9 @@ class ComprehensiveQuery extends Component {
   getContentCategoryOptions() {
     const { dictionaries } = this.props;
     const contentCategories = dictionaries && dictionaries.contentCategories ? dictionaries.contentCategories : [];
-    if (contentCategories.length === 0) {
+    // 只展示启用的内容分类
+    const enabledContentCategories = contentCategories.filter(category => category.status === 1);
+    if (enabledContentCategories.length === 0) {
       // 使用统一的字典配置作为备用
       const contentCategoriesFromConfig = Object.entries(CONTENT_CATEGORY_MAP);
       if (contentCategoriesFromConfig.length === 0) {
@@ -305,7 +311,7 @@ class ComprehensiveQuery extends Component {
         <Option key={code} value={name}>{name}</Option>
       ));
     }
-    return contentCategories.map(category => (
+    return enabledContentCategories.map(category => (
       <Option key={category.code} value={category.name}>{category.name}</Option>
     ));
   }
@@ -314,10 +320,12 @@ class ComprehensiveQuery extends Component {
   getDepartmentCategoryOptions() {
     const { dictionaries } = this.props;
     const departmentCategories = dictionaries && dictionaries.departmentCategories ? dictionaries.departmentCategories : [];
-    if (departmentCategories.length === 0) {
+    // 只展示启用的科室分类
+    const enabledDepartmentCategories = departmentCategories.filter(category => category.status === 1);
+    if (enabledDepartmentCategories.length === 0) {
       return [<Option key="no-data" value="">暂无数据</Option>];
     }
-    return departmentCategories.map(category => (
+    return enabledDepartmentCategories.map(category => (
       <Option key={category.code} value={category.name}>{category.name}</Option>
     ));
   }
@@ -617,7 +625,7 @@ class ComprehensiveQuery extends Component {
                   <Form.Item label="平台" style={{ marginBottom: 0 }}>
                     <Select
                       mode="multiple"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                       placeholder="选择平台"
                       value={filters.platform}
                       onChange={this.handlePlatformChange}
@@ -659,7 +667,7 @@ class ComprehensiveQuery extends Component {
                       <Form.Item label="科室" style={{ marginBottom: 0 }}>
                         <Select
                           mode="multiple"
-                          style={{ width: '100%' }}
+                          style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                           placeholder="选择科室"
                           value={filters.department}
                           onChange={this.handleDepartmentChange}
@@ -672,7 +680,7 @@ class ComprehensiveQuery extends Component {
                       <Form.Item label="科室分类" style={{ marginBottom: 0 }}>
                         <Select
                           mode="multiple"
-                          style={{ width: '100%' }}
+                          style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                           placeholder="选择科室分类"
                           value={filters.departmentCategory}
                           onChange={this.handleDepartmentCategoryChange}
@@ -685,7 +693,7 @@ class ComprehensiveQuery extends Component {
                       <Form.Item label="内容分类" style={{ marginBottom: 0 }}>
                         <Select
                           mode="multiple"
-                          style={{ width: '100%' }}
+                          style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                           placeholder="选择内容分类"
                           value={filters.contentCategory}
                           onChange={this.handleContentCategoryChange}
@@ -760,7 +768,7 @@ class ComprehensiveQuery extends Component {
                   <Form.Item label="平台" style={{ marginBottom: 0 }}>
                     <Select
                       mode="multiple"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                       placeholder="选择平台"
                       value={filters.platform}
                       onChange={this.handlePlatformChange}
@@ -776,7 +784,7 @@ class ComprehensiveQuery extends Component {
                   <Form.Item label="科室" style={{ marginBottom: 0 }}>
                     <Select
                       mode="multiple"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                       placeholder="选择科室"
                       value={filters.department}
                       onChange={this.handleDepartmentChange}
@@ -792,7 +800,7 @@ class ComprehensiveQuery extends Component {
                   <Form.Item label="科室分类" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} style={{ marginBottom: 0 }}>
                     <Select
                       mode="multiple"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                       placeholder="选择科室分类"
                       value={filters.departmentCategory}
                       onChange={this.handleDepartmentCategoryChange}
@@ -808,7 +816,7 @@ class ComprehensiveQuery extends Component {
                   <Form.Item label="内容分类" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} style={{ marginBottom: 0 }}>
                     <Select
                       mode="multiple"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', maxHeight: '120px', overflowY: 'auto' }}
                       placeholder="选择内容分类"
                       value={filters.contentCategory}
                       onChange={this.handleContentCategoryChange}

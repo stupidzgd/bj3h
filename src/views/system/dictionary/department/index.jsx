@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Select, message, Popconfirm, Icon } from 'antd';
 import axios from '@/utils/request';
 import { connect } from 'react-redux';
+import { fetchDictionaries } from '@/store/actions/dictionary';
 
 const { Option } = Select;
 
-const DepartmentManagement = ({ form, dictionaries }) => {
+const DepartmentManagement = ({ form, dictionaries, fetchDictionaries }) => {
   const [data, setData] = useState([]);
   const [departmentCategories, setDepartmentCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,10 +19,22 @@ const DepartmentManagement = ({ form, dictionaries }) => {
   const fetchDepartmentCategories = async () => {
     try {
       const response = await axios.get('/api/department-categories');
-      if (response.data.status === 0) {
-        setDepartmentCategories(response.data.data);
+      // 检查API响应是否成功，根据实际API返回格式调整
+      if (response.data) {
+        // 如果响应是对象且有data字段，使用data字段
+        if (typeof response.data === 'object' && response.data.data) {
+          setDepartmentCategories(response.data.data);
+        } 
+        // 如果响应直接是数组，直接使用
+        else if (Array.isArray(response.data)) {
+          setDepartmentCategories(response.data);
+        } 
+        // 其他情况，尝试使用整个响应
+        else {
+          setDepartmentCategories(response.data);
+        }
       } else {
-        message.error(response.data.message || '获取科室分类列表失败');
+        message.error('获取科室分类列表失败');
       }
     } catch (error) {
       message.error('获取科室分类列表失败');
@@ -34,10 +47,26 @@ const DepartmentManagement = ({ form, dictionaries }) => {
     setLoading(true);
     try {
       const response = await axios.get('/api/departments');
-      if (response.data.status === 0) {
-        setData(response.data.data);
+      // 检查API响应是否成功，根据实际API返回格式调整
+      if (response.data) {
+        let departments = [];
+        // 如果响应是对象且有data字段，使用data字段
+        if (typeof response.data === 'object' && response.data.data) {
+          departments = response.data.data;
+        } 
+        // 如果响应直接是数组，直接使用
+        else if (Array.isArray(response.data)) {
+          departments = response.data;
+        } 
+        // 其他情况，尝试使用整个响应
+        else {
+          departments = response.data;
+        }
+        // 按照ID从小到大排序，确保新增的字典项默认排在最后
+        const sortedDepartments = departments.sort((a, b) => (a.id || 0) - (b.id || 0));
+        setData(sortedDepartments);
       } else {
-        message.error(response.data.message || '获取科室列表失败');
+        message.error('获取科室列表失败');
       }
     } catch (error) {
       message.error('获取科室列表失败');
@@ -49,24 +78,10 @@ const DepartmentManagement = ({ form, dictionaries }) => {
 
   // 初始化数据
   useEffect(() => {
-    // 优先使用全局字典数据
-    if (dictionaries) {
-      if (dictionaries.departments) {
-        setData(dictionaries.departments);
-      } else {
-        fetchDepartments();
-      }
-      if (dictionaries.departmentCategories) {
-        setDepartmentCategories(dictionaries.departmentCategories);
-      } else {
-        fetchDepartmentCategories();
-      }
-    } else {
-      // 全局数据不存在时，从API获取
-      fetchDepartmentCategories();
-      fetchDepartments();
-    }
-  }, [dictionaries]);
+    // 直接从API获取数据，确保能获取到所有科室，包括被禁用的
+    fetchDepartmentCategories();
+    fetchDepartments();
+  }, []);
 
   // 打开添加模态框
   const handleAdd = () => {
@@ -84,7 +99,6 @@ const DepartmentManagement = ({ form, dictionaries }) => {
     form.setFieldsValue({
       code: record.code,
       name: record.name,
-      departmentCategoryId: record.departmentCategoryId,
       description: record.description,
       status: record.status
     });
@@ -96,14 +110,28 @@ const DepartmentManagement = ({ form, dictionaries }) => {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(`/api/departments/${id}`);
-      if (response.data.status === 0) {
-        message.success('删除科室成功');
+      const resData = response.data !== undefined ? response.data : response;
+      // 检查API响应是否成功，根据实际API返回格式调整
+      if (resData && (resData.status === 0 || resData.status === 1 || resData.success || (resData.message && resData.message.includes('成功')))) {
+        message.success(resData.message || '删除科室成功');
         fetchDepartments();
+        // 更新Redux store中的字典数据
+        fetchDictionaries();
       } else {
-        message.error(response.data.message || '删除科室失败');
+        // 尝试从响应中获取错误信息
+        const errorMessage = (resData && resData.message) || (resData && resData.msg) || '删除科室失败';
+        message.error(errorMessage);
+        console.error('删除科室失败:', resData);
       }
     } catch (error) {
-      message.error('删除科室失败');
+      // 尝试从错误对象中获取错误信息
+      let errorMessage = '删除科室失败';
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data.message || error.response.data.msg || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      message.error(errorMessage);
       console.error('删除科室错误:', error);
     }
   };
@@ -123,8 +151,17 @@ const DepartmentManagement = ({ form, dictionaries }) => {
       message.success('批量删除科室成功');
       setSelectedRowKeys([]);
       fetchDepartments();
+      // 更新Redux store中的字典数据
+      fetchDictionaries();
     } catch (error) {
-      message.error('批量删除科室失败');
+      // 尝试从错误对象中获取错误信息
+      let errorMessage = '批量删除科室失败';
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data.message || error.response.data.msg || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      message.error(errorMessage);
       console.error('批量删除科室错误:', error);
     }
   };
@@ -142,16 +179,29 @@ const DepartmentManagement = ({ form, dictionaries }) => {
         // 更新科室
         axios.put(`/api/departments/${editingRecord.id}`, values)
           .then(res => {
-            if (res.data.status === 0) {
+            // 检查API响应是否成功，根据实际API返回格式调整
+            if (res.data && (res.data.status === 0 || res.data.status === 1 || res.data.success)) {
               message.success('更新科室成功');
               setModalVisible(false);
               fetchDepartments();
+              // 更新Redux store中的字典数据
+              fetchDictionaries();
             } else {
-              message.error(res.data.message || '更新科室失败');
+              // 尝试从响应中获取错误信息
+              const errorMessage = res.data.message || res.data.msg || '更新科室失败';
+              message.error(errorMessage);
+              console.error('更新科室失败:', res.data);
             }
           })
           .catch(error => {
-            message.error('操作失败');
+            // 尝试从错误对象中获取错误信息
+            let errorMessage = '操作失败';
+            if (error.response && error.response.data) {
+              errorMessage = error.response.data.message || error.response.data.msg || errorMessage;
+            } else if (error.message) {
+              errorMessage = error.message;
+            }
+            message.error(errorMessage);
             console.error('操作错误:', error);
           })
           .finally(() => {
@@ -161,16 +211,29 @@ const DepartmentManagement = ({ form, dictionaries }) => {
         // 创建科室
         axios.post('/api/departments', values)
           .then(res => {
-            if (res.data.status === 0) {
+            // 检查API响应是否成功，根据实际API返回格式调整
+            if (res.data && (res.data.status === 0 || res.data.status === 1 || res.data.success)) {
               message.success('创建科室成功');
               setModalVisible(false);
               fetchDepartments();
+              // 更新Redux store中的字典数据
+              fetchDictionaries();
             } else {
-              message.error(res.data.message || '创建科室失败');
+              // 尝试从响应中获取错误信息
+              const errorMessage = res.data.message || res.data.msg || '创建科室失败';
+              message.error(errorMessage);
+              console.error('创建科室失败:', res.data);
             }
           })
           .catch(error => {
-            message.error('操作失败');
+            // 尝试从错误对象中获取错误信息
+            let errorMessage = '操作失败';
+            if (error.response && error.response.data) {
+              errorMessage = error.response.data.message || error.response.data.msg || errorMessage;
+            } else if (error.message) {
+              errorMessage = error.message;
+            }
+            message.error(errorMessage);
             console.error('操作错误:', error);
           })
           .finally(() => {
@@ -185,38 +248,43 @@ const DepartmentManagement = ({ form, dictionaries }) => {
     {
       title: '序号',
       key: 'index',
+      width: 80,
       render: (_, __, index) => index + 1
     },
     {
       title: '科室代码',
       dataIndex: 'code',
-      key: 'code'
+      key: 'code',
+      width: 120
     },
     {
       title: '科室名称',
       dataIndex: 'name',
-      key: 'name'
+      key: 'name',
+      width: 180
     },
     {
       title: '所属分类',
       dataIndex: 'departmentCategory',
       key: 'departmentCategory',
+      width: 150,
       render: (departmentCategory) => departmentCategory?.name || ''
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      width: 80,
       render: (status) => status === 1 ? '启用' : '禁用'
     },
     {
       title: '操作',
       key: 'action',
+      width: 200,
       render: (_, record) => (
-        <>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <Button 
             type="primary" 
-            icon={<Icon type="edit" />} 
             size="small" 
             style={{ marginRight: 8 }} 
             onClick={() => handleEdit(record)}
@@ -233,7 +301,7 @@ const DepartmentManagement = ({ form, dictionaries }) => {
               删除
             </Button>
           </Popconfirm>
-        </>
+        </div>
       )
     }
   ];
@@ -245,7 +313,15 @@ const DepartmentManagement = ({ form, dictionaries }) => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: '10px 16px' }}>
+      <style>{`
+        @media (min-width: 768px) {
+          .table-row-department .ant-table-thead > tr > th,
+          .table-row-department .ant-table-tbody > tr > td {
+            padding: 8px 12px;
+          }
+        }
+      `}</style>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>科室管理</h2>
         <div>
@@ -264,14 +340,17 @@ const DepartmentManagement = ({ form, dictionaries }) => {
         </div>
       </div>
 
-      <Table
-        rowSelection={rowSelection}
-        columns={columns}
-        dataSource={data}
-        rowKey="id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-      />
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={data}
+          rowKey="id"
+          loading={loading}
+          pagination={{ pageSize: 10 }}
+          className="table-row-department"
+        />
+      </div>
 
       <Modal
         title={editingRecord ? '编辑科室' : '添加科室'}
@@ -287,45 +366,98 @@ const DepartmentManagement = ({ form, dictionaries }) => {
           <Form.Item
             key="code"
             label="科室代码"
-            rules={[{ required: true, message: '请输入科室代码' }]}
           >
-            <Input placeholder="请输入科室代码" />
+            {form.getFieldDecorator('code', {
+              rules: [
+                { required: true, message: '请输入科室代码' },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value) {
+                      const isDuplicate = data.some(item => 
+                        item.code === value && 
+                        (!editingRecord || item.id !== editingRecord.id)
+                      );
+                      if (isDuplicate) {
+                        callback('科室代码已存在');
+                      } else {
+                        callback();
+                      }
+                    } else {
+                      callback();
+                    }
+                  }
+                }
+              ]
+            })(
+              <Input placeholder="请输入科室代码" />
+            )}
           </Form.Item>
           <Form.Item
             key="name"
             label="科室名称"
-            rules={[{ required: true, message: '请输入科室名称' }]}
           >
-            <Input placeholder="请输入科室名称" />
+            {form.getFieldDecorator('name', {
+              rules: [
+                { required: true, message: '请输入科室名称' },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value) {
+                      const isDuplicate = data.some(item => 
+                        item.name === value && 
+                        (!editingRecord || item.id !== editingRecord.id)
+                      );
+                      if (isDuplicate) {
+                        callback('科室名称已存在');
+                      } else {
+                        callback();
+                      }
+                    } else {
+                      callback();
+                    }
+                  }
+                }
+              ]
+            })(
+              <Input placeholder="请输入科室名称" />
+            )}
           </Form.Item>
-          <Form.Item
+          {/* 暂时屏蔽所属分类选项 */}
+          {/* <Form.Item
             key="departmentCategoryId"
             label="所属分类"
-            rules={[{ required: true, message: '请选择所属分类' }]}
           >
-            <Select placeholder="请选择所属分类">
-              {departmentCategories.map(category => (
-                <Option key={category.id} value={category.id}>
-                  {category.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
+            {form.getFieldDecorator('departmentCategoryId', {
+              rules: [{ required: true, message: '请选择所属分类' }]
+            })(
+              <Select placeholder="请选择所属分类">
+                {departmentCategories.map(category => (
+                  <Option key={category.id} value={category.id}>
+                    {category.name}
+                  </Option>
+                ))}
+              </Select>
+            )}
+          </Form.Item> */}
           <Form.Item
             key="description"
             label="科室描述"
           >
-            <Input.TextArea placeholder="请输入科室描述" rows={3} />
+            {form.getFieldDecorator('description')(
+              <Input.TextArea placeholder="请输入科室描述" rows={3} />
+            )}
           </Form.Item>
           <Form.Item
             key="status"
             label="状态"
-            rules={[{ required: true, message: '请选择状态' }]}
           >
-            <Select placeholder="请选择状态">
-              <Option value={1}>启用</Option>
-              <Option value={0}>禁用</Option>
-            </Select>
+            {form.getFieldDecorator('status', {
+              rules: [{ required: true, message: '请选择状态' }]
+            })(
+              <Select placeholder="请选择状态">
+                <Option value={1}>启用</Option>
+                <Option value={0}>禁用</Option>
+              </Select>
+            )}
           </Form.Item>
         </Form>
       </Modal>
@@ -339,4 +471,10 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(Form.create()(DepartmentManagement));
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchDictionaries: () => dispatch(fetchDictionaries())
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form.create()(DepartmentManagement));
