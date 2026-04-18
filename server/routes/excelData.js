@@ -6,6 +6,16 @@ const MediaPublishData = require('../models/MediaPublishData');
 const ProvinceRatio = require('../models/ProvinceRatio');
 const { info, error, warn, debug } = require('../config/logger');
 
+// 辅助函数：检查数据库中的department_category是否包含精确匹配的筛选条件
+// 按"、"分隔后，检查数组中是否存在精确等于filterCategory的项
+function exactMatchDepartmentCategory(recordDeptCategory, filterCategory) {
+  if (!recordDeptCategory || !filterCategory) {
+    return false;
+  }
+  const categories = recordDeptCategory.split('、');
+  return categories.includes(filterCategory);
+}
+
 // 统一查询接口（支持GET和POST方法）
 router.get('/query', async (req, res) => {
   try {
@@ -14,6 +24,9 @@ router.get('/query', async (req, res) => {
     info(`查询数据请求 (GET)，参数: platform=${platform}, department=${department}, departmentCategory=${departmentCategory}, contentCategory=${contentCategory}, startDate=${startDate}, endDate=${endDate}, importStartDate=${importStartDate}, importEndDate=${importEndDate}, keyword=${keyword}`);
     
     const where = {};
+    
+    // 保存departmentCategory的筛选条件，稍后用代码逻辑精确匹配
+    const departmentCategoryFilter = departmentCategory;
     
     if (platform) {
       if (Array.isArray(platform) && platform.length > 0) {
@@ -33,15 +46,23 @@ router.get('/query', async (req, res) => {
         where.department_name = department;
       }
     }
+    
+    // departmentCategory的模糊查询条件，用于初步筛选
+    let departmentCategoryWhere = null;
     if (departmentCategory) {
       if (Array.isArray(departmentCategory) && departmentCategory.length > 0) {
-        where.department_category = {
-          [Op.in]: departmentCategory
+        departmentCategoryWhere = {
+          [Op.or]: departmentCategory.map(cat => ({
+            department_category: { [Op.like]: `%${cat}%` }
+          }))
         };
       } else if (typeof departmentCategory === 'string') {
-        where.department_category = departmentCategory;
+        departmentCategoryWhere = {
+          department_category: { [Op.like]: `%${departmentCategory}%` }
+        };
       }
     }
+    
     if (contentCategory) {
       if (Array.isArray(contentCategory) && contentCategory.length > 0) {
         where.content_category = {
@@ -85,19 +106,43 @@ router.get('/query', async (req, res) => {
       ];
     }
     
-    const data = await MediaPublishData.findAll({ 
-      where,
+    // 构建最终的查询条件，如果有departmentCategoryWhere则合并
+    let finalWhere = where;
+    if (departmentCategoryWhere) {
+      finalWhere = {
+        ...where,
+        ...departmentCategoryWhere
+      };
+    }
+    
+    let data = await MediaPublishData.findAll({ 
+      where: finalWhere,
       include: [{
         model: ProvinceRatio,
         as: 'provinceRatios',
-        required: false // 使用左连接，确保即使没有关联数据也能返回
+        required: false
       }]
     });
+    
+    // 如果有departmentCategory筛选条件，在代码中精确匹配
+    if (departmentCategoryFilter) {
+      if (Array.isArray(departmentCategoryFilter) && departmentCategoryFilter.length > 0) {
+        data = data.filter(item => 
+          departmentCategoryFilter.some(filterCat => 
+            exactMatchDepartmentCategory(item.department_category, filterCat)
+          )
+        );
+      } else if (typeof departmentCategoryFilter === 'string') {
+        data = data.filter(item => 
+          exactMatchDepartmentCategory(item.department_category, departmentCategoryFilter)
+        );
+      }
+    }
     
     // 获取最大的 import_time
     let lastUpdateTime = null;
     if (data.length > 0) {
-      const maxImportTime = await MediaPublishData.max('import_time', { where });
+      const maxImportTime = await MediaPublishData.max('import_time', { where: finalWhere });
       if (maxImportTime) {
         lastUpdateTime = maxImportTime.toISOString().slice(0, 19).replace('T', ' ');
       }
@@ -124,6 +169,9 @@ router.post('/query', async (req, res) => {
     
     const where = {};
     
+    // 保存departmentCategory的筛选条件，稍后用代码逻辑精确匹配
+    const departmentCategoryFilter = departmentCategory;
+    
     if (platform) {
       if (Array.isArray(platform) && platform.length > 0) {
         where.platform = {
@@ -144,14 +192,18 @@ router.post('/query', async (req, res) => {
         };
       }
     }
+    // departmentCategory的模糊查询条件，用于初步筛选
+    let departmentCategoryWhere = null;
     if (departmentCategory) {
       if (Array.isArray(departmentCategory) && departmentCategory.length > 0) {
-        where[Op.or] = departmentCategory.map(cat => ({
-          department_category: { [Op.like]: `%${cat}%` }
-        }));
+        departmentCategoryWhere = {
+          [Op.or]: departmentCategory.map(cat => ({
+            department_category: { [Op.like]: `%${cat}%` }
+          }))
+        };
       } else if (typeof departmentCategory === 'string') {
-        where.department_category = {
-          [Op.like]: `%${departmentCategory}%`
+        departmentCategoryWhere = {
+          department_category: { [Op.like]: `%${departmentCategory}%` }
         };
       }
     }
@@ -199,19 +251,39 @@ router.post('/query', async (req, res) => {
         { reporter: { [Op.like]: `%${keyword}%` } }
       ];
     }
-    info(11111111111,where, [{
-        model: ProvinceRatio,
-        as: 'provinceRatios',
-        required: false // 使用左连接，确保即使没有关联数据也能返回
-      }]);
-    const data = await MediaPublishData.findAll({ 
-      where,
+    
+    // 构建最终的查询条件，如果有departmentCategoryWhere则合并
+    let finalWhere = where;
+    if (departmentCategoryWhere) {
+      finalWhere = {
+        ...where,
+        ...departmentCategoryWhere
+      };
+    }
+    
+    let data = await MediaPublishData.findAll({ 
+      where: finalWhere,
       include: [{
         model: ProvinceRatio,
         as: 'provinceRatios',
-        required: false // 使用左连接，确保即使没有关联数据也能返回
+        required: false
       }]
     });
+    
+    // 如果有departmentCategory筛选条件，在代码中精确匹配
+    if (departmentCategoryFilter) {
+      if (Array.isArray(departmentCategoryFilter) && departmentCategoryFilter.length > 0) {
+        data = data.filter(item => 
+          departmentCategoryFilter.some(filterCat => 
+            exactMatchDepartmentCategory(item.department_category, filterCat)
+          )
+        );
+      } else if (typeof departmentCategoryFilter === 'string') {
+        data = data.filter(item => 
+          exactMatchDepartmentCategory(item.department_category, departmentCategoryFilter)
+        );
+      }
+    }
     
     // 获取最大的 import_time
     let lastUpdateTime = null;
